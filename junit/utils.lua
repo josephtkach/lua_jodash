@@ -17,9 +17,11 @@ end
 
 -------------------------------------------------------------------------------
 function tryCatch(try, catch)
-    if not pcall(try) then
-        catch()
+    local result, err = pcall(try) 
+    if not result then
+        catch(err)
+        print(err.red)
         print(" at ")
-        print(debug.traceback())
+        print(debug.traceback().red)
     end
 end

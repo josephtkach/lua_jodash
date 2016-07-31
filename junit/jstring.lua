@@ -36,11 +36,11 @@ local colorKeys = {
 
 local escapeString = string.char(27) .. '[%dm'
 
-for k,v in colorKeys do
+for k,v in pairs(colorKeys) do
   colorKeys[k] = escapeString:format(v)
 end
 
-getmetatable('').__index = function(str,i)
+getmetatable("").__index = function(str,i)
     if type(i) == 'number' then
         return string.sub(str,i,i)
     elseif type(i) == 'string' and colorKeys[i] then

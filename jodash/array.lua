@@ -19,6 +19,8 @@ function ex.chunk(A, size)
         table.insert(last, v)
         counter = counter + 1
     end
+
+    return out
 end
 
 -------------------------------------------------------------------------------

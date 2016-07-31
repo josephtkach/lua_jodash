@@ -1,18 +1,18 @@
 -------------------------------------------------------------------------------
 -- test driver for jodash
-require("string")
-require("utils")
+-------------------------------------------------------------------------------
+local junit = require("junit/index")
+local expect = require("junit/expect")
 
-local junit = require("junit")
-local jo = require("jodash")
+local jo = require("jodash/index")
 
 -------------------------------------------------------------------------------
 -- array tests
 local ArrayTests = junit:new({ name = "Array" })
 
 -------------------------------------------------------------------------------
-function ArrayTests.chunk()
-
+function ArrayTests.chunk(data)
+    expect( jo.chunk(data.empty) ):toBeEmpty()
 end
 
 -------------------------------------------------------------------------------

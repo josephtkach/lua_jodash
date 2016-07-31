@@ -9,8 +9,8 @@ set.__index = set
 
 -------------------------------------------------------------------------------
 -- hash and array need different implementations
-local arraySet = require("jo/array")
-local hashSet = require("jo/hash")
+local arraySet = require("jodash/array")
+local hashSet = require("jodash/hash")
 
 -------------------------------------------------------------------------------
 local function isArray(A)
@@ -25,15 +25,30 @@ local function isArray(A)
 end
 
 -------------------------------------------------------------------------------
-setmetatable(set, {
-    __index = function(A, key)
-        -- hook if possible
-        if getmetatable(A) == nil then setmetatable(A, set) end
+local function getInvoker(key)
+    return function(A, ...)
+         -- hook if possible
+        if getmetatable(A) == nil then
+            setmetatable(A, set)
+        end
         -- get appropriate metatable for data structure
         local mt = arraySet
-        if not isArray(A) then mt = hashSet end
-        local func = mt[key]
-        return func or rawget(A, key)
+        if not isArray(A) then
+            mt = hashSet 
+        end
+
+        local func = mt[key] or rawget(A, key)
+
+        local count = select("#", ...)
+        if count == 0 then return func(A) end
+        return func(A, unpack({...}))
+    end
+end
+
+-------------------------------------------------------------------------------
+setmetatable(set, {
+    __index = function(self, key)
+        return rawget(self, key) or getInvoker(key)
     end
 })
 

@@ -1,8 +1,21 @@
 -------------------------------------------------------------------------------
 -- better assertions
+-- copies some implementations from jodash. 
+--  *   avoid dependency
+--  *   redundancy creates safety when unit testing
 -------------------------------------------------------------------------------
 local expectation = {}
-expectation.__index = expectation
+expectation.__index = function(self, key)
+    local v = rawget(expectation, key)
+
+    if type(v) == "function" then
+        return function(...)
+            assert(v(unpack({...})))
+        end
+    end
+
+    return rawget(self, key)
+end
 
 -------------------------------------------------------------------------------
 function expectation:toExist()
@@ -70,10 +83,8 @@ local function isEqual(lhs, rhs) return lhs == rhs end
 -------------------------------------------------------------------------------
 function expectation:toInclude(needle, comparator)
     comparator = comparator or isEqual
-    -- copies the implementation from jodash. No dependency, and redundancy 
-    -- creates safety in this case
     for k,v in pairs(self.obj) do
-        if comparator(v, needled) then return true end
+        if comparator(v, needle) then return true end
     end
 
     return false
@@ -84,19 +95,83 @@ expectation.toContain = expectation.toInclude
 
 -------------------------------------------------------------------------------
 function expectation:toExclude(needle, comparator)
-    return not self:toInclude(needled, comparator)
+    return not self:toInclude(needle, comparator)
 end
 
 -------------------------------------------------------------------------------
 expectation.toNotContain = expectation.toExclude
 expectation.toNotInclude = expectation.toExclude
 
-
 -------------------------------------------------------------------------------
-function expect(obj) 
-    local out = {}
-    out.obj = obj
-    setmetatable(out, e)
-    return out
+function expectation:toIncludeKey(needle, comparator)
+    comparator = comparator or isEqual
+    -- copies the implementation from jodash. No dependency, and redundancy 
+    -- creates safety in this case
+    for k,v in pairs(self.obj) do
+        if comparator(k, needle) then return true end
+    end
+
+    return false
 end
 
+-------------------------------------------------------------------------------
+expectation.toContainKey = expectation.toIncludeKey
+
+-------------------------------------------------------------------------------
+function expectation:toIncludeKeys(keys, comparator)
+    for k, v in pairs(keys) do
+        -- O(n^2). todo
+        if not self:toIncludeKey(v) then return false end
+    end
+
+    return true
+end
+
+-------------------------------------------------------------------------------
+expectation.toContainKeys = expectation.toIncludeKeys
+
+-------------------------------------------------------------------------------
+function expectation:toExcludeKey(needle, comparator)
+    return not self:toIncludeKey(needle, comparator)
+end
+
+-------------------------------------------------------------------------------
+expectation.toNotContainKey = expectation.toExcludeKey
+expectation.toNotIncludeKey = expectation.toExcludeKey
+
+-------------------------------------------------------------------------------
+function expectation:toNotIncludeKeys(keys, comparator)
+    return not self:toIncludeKeys(keys, comparator)
+end
+
+-------------------------------------------------------------------------------
+expectation.toNotContainKeys = expectation.toExcludeKeys
+expectation.toNotIncludeKeys = expectation.toExcludeKeys
+
+-------------------------------------------------------------------------------
+-- a couple of extensions of my own
+-------------------------------------------------------------------------------
+function expectation:toBeEmpty(...)
+    return type(self.obj) == "table" and next(self.obj) == nil
+end
+
+-------------------------------------------------------------------------------
+function expectation.toMatchArray(rhs, comparator)
+    comparator = comparator or isEqual
+    for k,v in pairs(self.obj) do
+        if not comparator(rhs[k], v) then return false end
+    end
+
+    for k,v in pairs(rhs) do
+        if not self.obj[k] then return false end
+    end
+
+    return true
+end
+
+-------------------------------------------------------------------------------
+return function(obj)
+    local out = { obj = obj }
+    setmetatable(out, expectation)
+    return out
+end
