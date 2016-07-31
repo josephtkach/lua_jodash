@@ -7,14 +7,15 @@ exports.__index = exports
 -------------------------------------------------------------------------------
 require("junit/utils")
 require("junit/jstring")
-
--------------------------------------------------------------------------------
-local function hr()
-    print("-------------------------------------------------------------------------------")
-end
+require("junit/print")
 
 -------------------------------------------------------------------------------
 local s = tostring
+
+-------------------------------------------------------------------------------
+local function hr()
+    print(s("--------------------------------------------------------------------------------").white)
+end
 
 -------------------------------------------------------------------------------
 exports.data = {}
@@ -33,7 +34,7 @@ exports.data.alphabet = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
 -------------------------------------------------------------------------------
 exports.data.ten = {}
 for i = 1,10 do
-    exports.data.ten[i] = tostring(i)
+    exports.data.ten[i] = i
 end
 
 -------------------------------------------------------------------------------
@@ -42,18 +43,25 @@ function exports:run()
     print("Running test: " .. self.name)
     hr()
 
-    for k,v in pairs(self) do
-        print(k.green)
-        local failed = false
-        
-        tryCatch( function()
-            v(self.data)
-        end, function()
-            failed = true
-            print( s("Failed").red )
-        end)
+    local orderedTests = self.orderedTests
 
-        if not failed then print( s("Succeeded").green ) end
+    for k,v in pairs(orderedTests) do
+        local report = v.name.blue .. ": "
+
+        local succeeded = xpcall(function()
+            v.func(self.data)
+        end, function(msg)
+            report = report .. msg.red
+            print(report)
+            print(" at ")
+            print(debug.traceback().red)
+        end) 
+
+        if succeeded then
+            local toPad = 80 - report:len()
+            report = report .. string.rep(" ", toPad) .. s("Succeeded").green
+            print(report)
+        end
         hr()
     end
 end
@@ -63,6 +71,16 @@ function exports:new(params)
     local outmt = deepCopy(params)
     outmt.__index = outmt
     setmetatable(outmt, exports)
+
+    outmt.orderedTests = {}
+
+    outmt.__newindex = function(self, key, value)
+        if type(value) == "function" then
+            table.insert(outmt.orderedTests, { name = key, func = value })
+        else
+            rawset(self, key, value)
+        end
+    end
 
     local out = {}
     setmetatable(out, outmt)

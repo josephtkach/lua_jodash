@@ -10,11 +10,27 @@ expectation.__index = function(self, key)
 
     if type(v) == "function" then
         return function(...)
-            assert(v(unpack({...})))
+            local arg = {...}
+            local result = v(unpack(arg))
+            assert(result)
+            return result
         end
     end
 
     return rawget(self, key)
+end
+
+-------------------------------------------------------------------------------
+local expect = {}
+setmetatable(expect, expect)
+expect.__call = function(self, obj)
+    local out = { obj = obj, verbose = self.verbose }
+    
+    -- reset any flags that were set on construction
+    self.verbose = false
+
+    setmetatable(out, expectation)
+    return out
 end
 
 -------------------------------------------------------------------------------
@@ -156,22 +172,42 @@ function expectation:toBeEmpty(...)
 end
 
 -------------------------------------------------------------------------------
-function expectation.toMatchArray(rhs, comparator)
+function expectation:toMatchArray(rhs, comparator)
     comparator = comparator or isEqual
+
     for k,v in pairs(self.obj) do
-        if not comparator(rhs[k], v) then return false end
+        if type(v) == "table" then
+            local other = rhs[k]
+            if not type(other) == "table" then 
+                vprint(self, "type mismatch on key " .. tostring(k))
+                return false 
+            end
+
+            vprint(self, "shall recurse")
+            expect.verbose = self.verbose
+            if not expect(v):toMatchArray(other) then
+                vprint(self, "mismatch in subarray with key " .. tostring(k))
+                return false 
+            end
+        else
+            if not comparator(v, rhs[k]) then
+                vprint(self, "value mismatch on key " .. tostring(k))
+                vprint(self, "left " .. tostring(v))
+                vprint(self, "right " .. tostring(rhs))
+                return false
+            end
+        end
     end
 
     for k,v in pairs(rhs) do
-        if not self.obj[k] then return false end
+        if not self.obj[k] then
+            vprint(self, "key " .. tostring(k) .. " found in candidate array that did not match original")
+            return false 
+        end
     end
 
     return true
 end
 
 -------------------------------------------------------------------------------
-return function(obj)
-    local out = { obj = obj }
-    setmetatable(out, expectation)
-    return out
-end
+return expect

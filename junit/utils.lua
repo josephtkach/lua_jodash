@@ -14,14 +14,3 @@ function deepCopy(orig)
     end
     return copy
 end
-
--------------------------------------------------------------------------------
-function tryCatch(try, catch)
-    local result, err = pcall(try) 
-    if not result then
-        catch(err)
-        print(err.red)
-        print(" at ")
-        print(debug.traceback().red)
-    end
-end
