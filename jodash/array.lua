@@ -1,15 +1,24 @@
 -------------------------------------------------------------------------------
-local ex = {}
+local array = {}
 
 -------------------------------------------------------------------------------
-function ex.chunk(A, size)
-    if not A then return A end
-    if not size or size < 1 then size = 1 end
+-- mine
+function array.append(A, x)
+    if not A then A = {} end
+    table.insert(x)
+    return A
+end
 
+-------------------------------------------------------------------------------
+-- Creates an array of elements split into groups the length of size. 
+-- If array can’t be split evenly, the final chunk will be the remaining elements.
+function array.chunk(A, size)
+    if not size or size < 1 then size = 1 end
     local out = {}
     local last = nil
     local counter = size+1
-    for k,v in pairs(A) do
+
+    array.forEach(A, function(v, k)
         if counter > size then
             last = {}
             table.insert(out, last)
@@ -18,10 +27,246 @@ function ex.chunk(A, size)
 
         table.insert(last, v)
         counter = counter + 1
-    end
+    end)
 
     return out
 end
 
 -------------------------------------------------------------------------------
-return ex
+-- Creates an array with all falsey values removed.
+-- The values false, nil, 0, "", and NaN* are falsey. *not implemented yet
+function array.compact(A)
+
+end
+
+-------------------------------------------------------------------------------
+function array.concat(A, B, _inPlace)
+    local out
+    if _inPlace then 
+        out = A
+    else 
+        out = deepCopy(A) 
+    end
+
+    jo.forEach(B, function(x) table.insert(A, x) end)
+    return out
+end
+
+-------------------------------------------------------------------------------
+function array.difference(A, B)   -- the set of all B not in A
+    local output = set.new()
+    -- note: replace this with a call to `keyBy`
+    local A_has = set.valuesAsKeys(A)
+    
+    set.each(B, function(x) 
+        if A_has[x] == nil then
+             append(output, x) 
+        end 
+    end)
+
+    return output
+end
+
+-------------------------------------------------------------------------------
+function array.filter( A, predicate )
+    local output = set.new()
+    set.each(A, function(x, k)
+        if predicate(x, k, A) then output[k] = x end
+    end)
+    return output
+end
+
+-------------------------------------------------------------------------------
+function array.find(A, predicate)
+    if not A then return nil end
+    for k,v in pairs(A) do
+        if predicate(v) then return v end
+    end
+end
+
+-------------------------------------------------------------------------------
+function array.forEach( A, predicate )
+    if not A then return nil end
+    for k,v in ipairs(A) do
+        predicate(v, k, A)
+    end
+    return A
+end
+
+-------------------------------------------------------------------------------
+function array.indexOf(A, value)
+    if not A then return end
+    for k,v in pairs(A) do
+        if v == value then return k end
+    end
+    return nil
+end
+
+-------------------------------------------------------------------------------
+function array.intersection(A, B)
+    local output = set.new()
+    local B_has = set.valuesAsKeys(B)
+    
+    set.each(A, function(x) 
+        if B_has[x] then
+             append(output, x) 
+        end 
+    end)
+
+    return output
+end
+
+-------------------------------------------------------------------------------
+function array.keyBy( A, predicate )
+    local output = set.new()
+    set.each(A, function(v, k)
+        local newKey = predicate(v, k)
+        output[newKey] = v
+    end)
+    return output
+end
+
+-------------------------------------------------------------------------------
+function jo.last(A)
+    -- assumes a continuous array
+    if not A then return nil end
+    return A[#A]
+end
+
+-------------------------------------------------------------------------------
+function array.map( A, predicate )
+    local output = set.new()
+    for i,v in ipairs(A) do
+        table.insert(output, predicate(v, i))
+    end
+    return output
+end
+
+-------------------------------------------------------------------------------
+local function modularCount(A, count)
+    local length = set.size(A)
+
+    if count < 0 then
+        count = count % #A
+    end
+
+    if count == 0 then 
+        count = #A
+    end
+
+    return count
+end
+
+-------------------------------------------------------------------------------
+function array.nth(A, index, action)
+    if not A then return nil end
+    local index = modularCount(A, index)
+
+    local count = 1
+    for k,v in pairs(A) do
+        if count == index then
+            if action then return action(v) end
+            return v
+        end 
+        count = count + 1
+    end
+
+    return nil
+end
+
+-------------------------------------------------------------------------------
+function array.reduce(A, accumulator, predicate)
+    for k,v in pairs(A) do
+        accumulator = predicate(v, accumulator)
+    end
+
+    return accumulator
+end
+
+-------------------------------------------------------------------------------
+function array.remove(A, predicate)
+    local removed = set.new()
+    local intermediate = {}
+
+    set.each(A, function(x, k)
+        A[k] = nil
+        if predicate(x, k) then 
+            table.insert(removed, x)
+        else
+            table.insert(intermediate, x)
+        end
+    end)
+
+    local newCount = #intermediate
+    for i = 1, newCount do
+        table.insert(A, intermediate[i])
+    end
+
+    return removed
+end
+
+-------------------------------------------------------------------------------
+function array.sample(A)
+    return set.randomFromRangeInSet(A, 1, #A)
+end
+
+-------------------------------------------------------------------------------
+-- mine
+function array.sampleSlice(A, min, max)
+    if not A then return nil end
+
+    local index = min
+    if min < max then
+        index = math.random(min, max)
+    end
+
+    return A[index] or print("WARNING: invalid range supplied to sampleSlice")
+end
+
+-------------------------------------------------------------------------------
+function array.size(A)
+    return #A
+end
+
+-------------------------------------------------------------------------------
+function array.slice(A, count)
+    if not A then return A end
+    local output = set.new()
+
+    count = modularCount(A,count)
+    
+    for i = 1, count do
+        if not A[i] then return output end
+        table.insert(output, A[i])
+    end
+
+    return output
+end
+
+-------------------------------------------------------------------------------
+-- mine
+function array.splat(count, value)
+    local A = {}
+    for i = 1,count do
+        table.insert(A, value)
+    end
+    return A
+end
+
+-------------------------------------------------------------------------------
+function array.union(A, B)
+    local output = {}
+
+    jo.concat(output, A)
+    jo.concat(output, B)
+    return output
+end
+
+-------------------------------------------------------------------------------
+function array.uniq( A )
+    local A_has = set.valuesAsKeys(A)
+    return set.keys(A_has)
+end
+
+-------------------------------------------------------------------------------
+return array

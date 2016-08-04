@@ -19,7 +19,7 @@ end
 
 -------------------------------------------------------------------------------
 exports.data = {}
--- todo: make a factor for objects of this type
+-- todo: make a factory for objects of this type
 setmetatable(exports.data, { __index = function(self, key)
     return deepCopy(rawget(self, key))
 end })
