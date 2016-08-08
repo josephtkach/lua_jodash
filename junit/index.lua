@@ -9,61 +9,49 @@ require("junit/utils")
 require("junit/jstring")
 require("junit/print")
 
+exports.data = require("junit/data")
+
 -------------------------------------------------------------------------------
 local s = tostring
 
 -------------------------------------------------------------------------------
-local function hr()
+function exports:hr()
     print(s("--------------------------------------------------------------------------------").white)
 end
 
 -------------------------------------------------------------------------------
-exports.data = {}
--- todo: make a factory for objects of this type
-setmetatable(exports.data, { __index = function(self, key)
-    return deepCopy(rawget(self, key))
-end })
-
--------------------------------------------------------------------------------
-exports.data.empty = {}
-
--------------------------------------------------------------------------------
-exports.data.alphabet = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' }
-
--------------------------------------------------------------------------------
-exports.data.ten = {}
-for i = 1,10 do
-    exports.data.ten[i] = i
-end
-
--------------------------------------------------------------------------------
 function exports:run()
-    hr()
-    print("Running test: " .. self.name)
-    hr()
+    exports:hr()
+    print("Running test: " .. self.name.bright)
+    exports:hr()
 
     local orderedTests = self.orderedTests
+    local lastWasFailure = false
 
     for k,v in pairs(orderedTests) do
-        local report = v.name.blue .. ": "
+        local report = string.rep(" ", 8) .. v.name.blue .. ": "
 
         local succeeded = xpcall(function()
             v.func(self.data)
         end, function(msg)
             report = report .. msg.red
+            exports:hr()
             print(report)
             print(" at ")
             print(debug.traceback().red)
+            lastWasFailure = true
+            exports:hr()
         end) 
 
         if succeeded then
-            local toPad = 80 - report:len()
+            local toPad = 50 - report:len()
             report = report .. string.rep(" ", toPad) .. s("Succeeded").green
             print(report)
+            lastWasFailure = false
         end
-        hr()
     end
+    
+    if not lastWasFailure then exports:hr() end
 end
 
 -------------------------------------------------------------------------------

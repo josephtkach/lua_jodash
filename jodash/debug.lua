@@ -41,3 +41,11 @@ function jo.watch(object, field, options)
 
     replaceWithProxy(object, watchNewIndex)
 end
+
+-------------------------------------------------------------------------------
+function jo.print(A, label)
+    if not A then return A end
+    if label then print(label) end
+    printTable(A, 99)
+    return A
+end

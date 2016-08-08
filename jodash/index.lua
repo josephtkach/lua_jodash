@@ -26,21 +26,21 @@ local function getInvoker(key)
         local out
 
         -- get appropriate metatable for data structure
-        local mt = array
-        if not isArray(A) then
+        local mt =  array
+        if not jo.isArray(A) then
             mt = hash 
         end
 
         local func = mt[key] or rawget(A, key)
         local count = select("#", ...)
         if count == 0 then
-            out = func(A) 
+            out = func(A)
         else
             out = func(A, unpack({...}))
         end
         -- hook if possible
-        if getmetatable(A) == nil then
-            setmetatable(A, jo)
+        if getmetatable(out) == nil then
+            setmetatable(out, jo)
         end
 
         return out
@@ -50,7 +50,7 @@ end
 -------------------------------------------------------------------------------
 setmetatable(jo, {
     __index = function(self, key)
-        return rawget(self, key) or getInvoker(key)
+        return getInvoker(key)
     end
 })
 

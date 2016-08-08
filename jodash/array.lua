@@ -36,7 +36,7 @@ end
 -- Creates an array with all falsey values removed.
 -- The values false, nil, 0, "", and NaN* are falsey. *not implemented yet
 function array.compact(A)
-
+    return array.filter(A, jo.isTruthy)
 end
 
 -------------------------------------------------------------------------------
@@ -48,17 +48,18 @@ function array.concat(A, B, _inPlace)
         out = deepCopy(A) 
     end
 
-    jo.forEach(B, function(x) table.insert(A, x) end)
+    array.forEach(B, function(x) table.insert(A, x) end)
     return out
 end
 
+
 -------------------------------------------------------------------------------
 function array.difference(A, B)   -- the set of all B not in A
-    local output = set.new()
+    local output = jo.new()
     -- note: replace this with a call to `keyBy`
-    local A_has = set.valuesAsKeys(A)
+    local A_has = array.keyBy(A, jo.identity)
     
-    set.each(B, function(x) 
+    jo.forEach(B, function(x) 
         if A_has[x] == nil then
              append(output, x) 
         end 
@@ -69,9 +70,9 @@ end
 
 -------------------------------------------------------------------------------
 function array.filter( A, predicate )
-    local output = set.new()
-    set.each(A, function(x, k)
-        if predicate(x, k, A) then output[k] = x end
+    local output = {}
+    array.forEach(A, function(x, k)
+        if predicate(x, k, A) then table.insert(output, x) end
     end)
     return output
 end
@@ -104,10 +105,10 @@ end
 
 -------------------------------------------------------------------------------
 function array.intersection(A, B)
-    local output = set.new()
-    local B_has = set.valuesAsKeys(B)
+    local output = {}
+    local B_has = array.keyBy(B, jo.identity)
     
-    set.each(A, function(x) 
+    array.forEach(A, function(x) 
         if B_has[x] then
              append(output, x) 
         end 
@@ -118,8 +119,8 @@ end
 
 -------------------------------------------------------------------------------
 function array.keyBy( A, predicate )
-    local output = set.new()
-    set.each(A, function(v, k)
+    local output = {}
+    array.forEach(A, function(v, k)
         local newKey = predicate(v, k)
         output[newKey] = v
     end)
@@ -135,7 +136,7 @@ end
 
 -------------------------------------------------------------------------------
 function array.map( A, predicate )
-    local output = set.new()
+    local output = {}
     for i,v in ipairs(A) do
         table.insert(output, predicate(v, i))
     end
@@ -144,7 +145,7 @@ end
 
 -------------------------------------------------------------------------------
 local function modularCount(A, count)
-    local length = set.size(A)
+    local length = array.size(A)
 
     if count < 0 then
         count = count % #A
@@ -185,10 +186,10 @@ end
 
 -------------------------------------------------------------------------------
 function array.remove(A, predicate)
-    local removed = set.new()
+    local removed = {}
     local intermediate = {}
 
-    set.each(A, function(x, k)
+    array.forEach(A, function(x, k)
         A[k] = nil
         if predicate(x, k) then 
             table.insert(removed, x)
@@ -207,7 +208,7 @@ end
 
 -------------------------------------------------------------------------------
 function array.sample(A)
-    return set.randomFromRangeInSet(A, 1, #A)
+    return array.sampleSlice(A, 1, #A)
 end
 
 -------------------------------------------------------------------------------
@@ -231,7 +232,7 @@ end
 -------------------------------------------------------------------------------
 function array.slice(A, count)
     if not A then return A end
-    local output = set.new()
+    local output = {}
 
     count = modularCount(A,count)
     
@@ -264,8 +265,8 @@ end
 
 -------------------------------------------------------------------------------
 function array.uniq( A )
-    local A_has = set.valuesAsKeys(A)
-    return set.keys(A_has)
+    local A_has = array.keyBy(A, jo.identity)
+    return array.keys(A_has)
 end
 
 -------------------------------------------------------------------------------

@@ -179,21 +179,20 @@ function expectation:toMatchArray(rhs, comparator)
         if type(v) == "table" then
             local other = rhs[k]
             if not type(other) == "table" then 
-                vprint(self, "type mismatch on key " .. tostring(k))
+                print("type mismatch on key " .. tostring(k))
                 return false 
             end
 
-            vprint(self, "shall recurse")
             expect.verbose = self.verbose
             if not expect(v):toMatchArray(other) then
-                vprint(self, "mismatch in subarray with key " .. tostring(k))
+                print("mismatch in subarray with key " .. tostring(k))
                 return false 
             end
         else
             if not comparator(v, rhs[k]) then
-                vprint(self, "value mismatch on key " .. tostring(k))
-                vprint(self, "left " .. tostring(v))
-                vprint(self, "right " .. tostring(rhs))
+                print("value mismatch on key " .. tostring(k))
+                print("left " .. tostring(v))
+                print("right " .. tostring(rhs))
                 return false
             end
         end
@@ -201,7 +200,7 @@ function expectation:toMatchArray(rhs, comparator)
 
     for k,v in pairs(rhs) do
         if not self.obj[k] then
-            vprint(self, "key " .. tostring(k) .. " found in candidate array that did not match original")
+            print("key " .. tostring(k) .. " found in candidate array that did not match original")
             return false 
         end
     end

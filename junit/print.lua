@@ -91,6 +91,12 @@ function tprint (tbl, indent, maxRecursions)
 end
 
 -------------------------------------------------------------------------------
+-- syntactic sugar for cross-compatibility with work
+printTable = function(tbl, maxRecursions)
+    tprint(tbl, 0, maxRecursions)
+end
+
+-------------------------------------------------------------------------------
 function tprint_nr(table, indent, color)
     if getmetatable(table) and getmetatable(table).readonly then
         tprint_nr(getmetatable(table).original, indent, color)
