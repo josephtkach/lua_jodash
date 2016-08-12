@@ -1,14 +1,40 @@
 -------------------------------------------------------------------------------
-function jo.isArray(A)
-    if A == nil then return false end
+local jo = __
+
+-------------------------------------------------------------------------------
+local _functor = function(data, call)
+    local out = jo.hash.clone(data)
+
+    setmetatable(out, {
+        __call = call
+    })
+    return out
+end
+
+-------------------------------------------------------------------------------
+jo.functor = _functor
+
+-------------------------------------------------------------------------------
+local function _isArray(A)
     if #A == 0 then
         for k,v in pairs(A) do
             return false
         end
     end
-
     return true
 end
+
+-------------------------------------------------------------------------------
+jo.isArray = _functor({ dangerous = _isArray },
+    function(self, A)
+        for k,v in pairs(self) do
+            print(tostring(k) .. " : " .. tostring(v))
+        end
+
+        if A == nil or type(A) ~= "table" then return false end
+        return self.dangerous(A)
+    end
+)
 
 -------------------------------------------------------------------------------
 function jo.isEmpty(A)
@@ -25,8 +51,18 @@ function jo.isFalsey(A)
 end
 
 -------------------------------------------------------------------------------
+function jo.isTable(A)
+    return type(A) == "table"
+end
+
+-------------------------------------------------------------------------------
 function jo.isTruthy(A)
     return not jo.isFalsey(A)
+end
+
+-------------------------------------------------------------------------------
+function jo.swap(A,B)
+    return B, A
 end
 
 -------------------------------------------------------------------------------

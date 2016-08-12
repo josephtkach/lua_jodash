@@ -1,11 +1,14 @@
 -------------------------------------------------------------------------------
+-- implementations for array tables
+-------------------------------------------------------------------------------
 local array = {}
+local jo = __
 
 -------------------------------------------------------------------------------
 -- mine
 function array.append(A, x)
     if not A then A = {} end
-    table.insert(x)
+    table.insert(A, x)
     return A
 end
 
@@ -40,18 +43,35 @@ function array.compact(A)
 end
 
 -------------------------------------------------------------------------------
-function array.concat(A, B, _inPlace)
-    local out
-    if _inPlace then 
-        out = A
-    else 
-        out = deepCopy(A) 
+-- Creates a new array concatenating array with any additional arrays and/or values. 
+function array.concat(...)
+    local out = {}
+    local _append = function(x) table.insert(out, x) end
+
+    local args = {...}
+
+    if jo.isTable(args[1]) then 
+        array.forEach(A, _append)
     end
 
-    array.forEach(B, function(x) table.insert(A, x) end)
+    for i,v in ipairs({...}) do
+        if type(v) == "table" then
+            array.forEach(v, _append)
+        else
+            table.insert(out, v)
+        end
+    end
     return out
 end
 
+-------------------------------------------------------------------------------
+function array.clone(A)
+    local out = {}
+    array.forEach(A, function(x)
+        table.insert(out, x) 
+    end)
+    return out
+end
 
 -------------------------------------------------------------------------------
 function array.difference(A, B)   -- the set of all B not in A

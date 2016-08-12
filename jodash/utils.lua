@@ -1,6 +1,9 @@
 -------------------------------------------------------------------------------
 -- functions that are data-structure-agnostic
 -------------------------------------------------------------------------------
+local jo = __
+
+-------------------------------------------------------------------------------
 function jo.identity(x)
     return x
 end
@@ -11,4 +14,3 @@ function jo.plainOldData(A)
     setmetatable(A, nil)
     return A
 end
-

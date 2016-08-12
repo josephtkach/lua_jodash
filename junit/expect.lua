@@ -199,7 +199,7 @@ function expectation:toMatchArray(rhs, comparator)
     end
 
     for k,v in pairs(rhs) do
-        if not self.obj[k] then
+        if self.obj[k] == nil then
             print("key " .. tostring(k) .. " found in candidate array that did not match original")
             return false 
         end

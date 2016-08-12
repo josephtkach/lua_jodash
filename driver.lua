@@ -6,5 +6,6 @@ expect = require("junit/expect")
 jo = require("jodash/index")
 
 -------------------------------------------------------------------------------
-require("tests/chunk"):run()
-require("tests/compact"):run()
+--require("tests/chunk"):run()
+--require("tests/compact"):run()
+require("tests/concat"):run()

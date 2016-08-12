@@ -1,4 +1,6 @@
 -------------------------------------------------------------------------------
+local jo = __
+-------------------------------------------------------------------------------
 -- define a fault-tolerant object
 -------------------------------------------------------------------------------
 local function mathNoop(lhs, rhs)
@@ -31,6 +33,6 @@ setmetatable(faultTolerantObject, {
 })
 
 -------------------------------------------------------------------------------
-function safe(value)
+function jo.safe(value)
     return value or faultTolerantObject
 end
