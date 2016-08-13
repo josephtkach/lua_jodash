@@ -3,7 +3,7 @@ local jo = __
 
 -------------------------------------------------------------------------------
 local _functor = function(data, call)
-    local out = jo.hash.clone(data)
+    local out = data or {}
 
     setmetatable(out, {
         __call = call
@@ -48,6 +48,11 @@ function jo.isFalsey(A)
         or A == ""
         or A == 0
         --or isNan(A) -- todo: bind a C++ NaN check
+end
+
+-------------------------------------------------------------------------------
+function jo.isFunction(A)
+    return type(A) == "function"
 end
 
 -------------------------------------------------------------------------------

@@ -5,37 +5,6 @@ local hash = {}
 local jo = __
 
 -------------------------------------------------------------------------------
-local function assign_inner(A, B, allowOverwrite)
-    if not A then A = {} end
-    if not B then return A end
-    
-    hash.forEach(B, function(v, k)
-        local rhs = A[k]
-        if rhs then
-            if isTable(rhs) then
-                A[k] = assign_inner(v, rhs, allowOverwrite)
-            elseif allowOverwrite then
-                A[k] = v 
-            end
-        else
-            A[k] = v 
-        end
-    end)
-
-    return A
-end
-
--------------------------------------------------------------------------------
-function hash.assign(A, B, allowOverwrite)
-    return assign_inner(A, B, allowOverwrite)
-end
-
--------------------------------------------------------------------------------
-function hash.clone(A)
-    return assign_inner(nil, A)
-end
-
--------------------------------------------------------------------------------
 function hash.differenceKeys(A, B)    -- the set of all B not in A
     local output = {}
 

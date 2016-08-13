@@ -2,16 +2,17 @@
 -- jodash
 -- a lua implementation of lodash
 -- by Joseph Tkach
--------------------------------------------------------------------------------
-assert(__ == nil, 
-    "jodash requires __ to be an available key in _G in order to initialize")
 
+-------------------------------------------------------------------------------
+--supend lobal metatable if it exists
+--remove _G[__] and restore it at the end
 -------------------------------------------------------------------------------
 __ = {}
 local _jo = __
 
 -------------------------------------------------------------------------------
-local jo = {}
+local exports = {}
+_jo._ = exports
 
 -------------------------------------------------------------------------------
 -- jodash, assemble!
@@ -41,7 +42,7 @@ retriever[HASH_TYPE] = function(key, A)
 end
 
 retriever[OTHER_TYPE] = function(key, A)
-    return _jo.array[key] or _jo.hash[key] or rawget(jo, key)
+    return _jo.array[key] or _jo.hash[key] or rawget(_jo, key)
 end
 
 -------------------------------------------------------------------------------
@@ -92,7 +93,7 @@ function _jo.new(A)
 end
 
 -------------------------------------------------------------------------------
-setmetatable(jo, {
+setmetatable(exports, {
     __index = function(self, key)
         return getInvoker(key)
     end,
@@ -110,4 +111,4 @@ _jo.marshal = function(A) return A end
 __ = nil
 
 -------------------------------------------------------------------------------
-return jo
+return exports

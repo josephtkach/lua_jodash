@@ -48,44 +48,60 @@ function array.concat(...)
     local out = {}
     local _append = function(x) table.insert(out, x) end
 
-    local args = {...}
-
-    if jo.isTable(args[1]) then 
-        array.forEach(A, _append)
-    end
-
-    for i,v in ipairs({...}) do
-        if type(v) == "table" then
-            array.forEach(v, _append)
+    array.forEach({...}, function(arg)
+        if jo.isTable(arg) then
+            array.forEach(arg, _append)
         else
-            table.insert(out, v)
+            table.insert(out, arg)
         end
-    end
-    return out
-end
-
--------------------------------------------------------------------------------
-function array.clone(A)
-    local out = {}
-    array.forEach(A, function(x)
-        table.insert(out, x) 
     end)
+
     return out
 end
 
 -------------------------------------------------------------------------------
-function array.difference(A, B)   -- the set of all B not in A
-    local output = jo.new()
-    -- note: replace this with a call to `keyBy`
-    local A_has = array.keyBy(A, jo.identity)
-    
-    jo.forEach(B, function(x) 
-        if A_has[x] == nil then
-             append(output, x) 
+local function _difference(iteratee, A, ...)
+    iteratee = iteratee or jo.utils
+
+    local out = {}
+    local test = {}
+
+    local _assign = function(x) 
+        test[ iteratee(x) ] = true
+    end
+
+    array.forEach({...}, function(arg)
+        jo._.forEach(arg, _assign)
+    end)
+
+    array.forEach(A, function(x)
+        x = iteratee(x)
+        if test[x] == nil then
+            table.insert(out, x)
         end 
     end)
 
-    return output
+    return out
+end
+
+-------------------------------------------------------------------------------
+-- Creates an array of array values not included in the other given arrays 
+-- The order of result values is determined by the order they occur in the 
+-- first array. 
+function array.difference(A, ...)
+    return _difference(nil, A, unpack({...}))
+end
+
+-------------------------------------------------------------------------------
+function array.differenceBy(A, ...)
+    local args = {...}
+    local count = #args
+    local last = args[count]
+    if not jo.isTable(last) then
+        args[count] = nil
+        return _difference(last, A, unpack(args))
+    end
+    return _difference(A, unpack(args))
 end
 
 -------------------------------------------------------------------------------
@@ -108,8 +124,8 @@ end
 -------------------------------------------------------------------------------
 function array.forEach( A, predicate )
     if not A then return nil end
-    for k,v in ipairs(A) do
-        predicate(v, k, A)
+    for i,v in ipairs(A) do
+        predicate(v, i, A)
     end
     return A
 end

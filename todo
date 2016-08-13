@@ -1,0 +1,7 @@
+fix output on unit tests
+unit test framework can receive multiple objects from a single file
+automatically read unit tests from test library
+
+-- onlyfailed command line option
+
+perf metrics
