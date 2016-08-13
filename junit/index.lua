@@ -32,7 +32,7 @@ function exports:run()
         local report = string.rep(" ", 8) .. v.name.blue .. ": "
 
         local succeeded = xpcall(function()
-            v.func(self.data)
+            v.func(self.data, self.userData)
         end, function(msg)
             report = report .. msg.red
             exports:hr()

@@ -61,7 +61,7 @@ end
 
 -------------------------------------------------------------------------------
 local function _difference(iteratee, A, ...)
-    iteratee = iteratee or jo.utils
+    iteratee = iteratee or jo.identity
 
     local out = {}
     local test = {}
@@ -97,11 +97,13 @@ function array.differenceBy(A, ...)
     local args = {...}
     local count = #args
     local last = args[count]
+
     if not jo.isTable(last) then
         args[count] = nil
         return _difference(last, A, unpack(args))
     end
-    return _difference(A, unpack(args))
+    
+    return _difference(nil, A, unpack(args))
 end
 
 -------------------------------------------------------------------------------
