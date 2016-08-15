@@ -1,7 +1,6 @@
 prettify output on unit tests
 automatically read unit tests from test library?
 
--- onlyfailed command line option
 
 init function
     -- string metatable options

@@ -123,6 +123,25 @@ function array.differenceWith(A, ...)
 end
 
 -------------------------------------------------------------------------------
+function array.drop(A, count)
+    local out = {}
+    for i = 1 + (count or 1), #A do
+        table.insert(out, A[i])
+    end
+    return out
+end
+
+-------------------------------------------------------------------------------
+function array.dropRight(A, count)
+    local out = {}
+    count = #A - (count or 1)
+    for i = 1, count do
+        table.insert(out, A[i])
+    end
+    return out
+end
+
+-------------------------------------------------------------------------------
 function array.filter( A, predicate )
     local output = {}
     array.forEach(A, function(x, k)

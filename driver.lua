@@ -15,6 +15,8 @@ require("tests/concat"):run()
 require("tests/difference"):run()
 require("tests/differenceBy"):run()
 require("tests/differenceWith"):run()
+require("tests/drop"):run()
+require("tests/dropRight"):run()
 
 -------------------------------------------------------------------------------
 junit.report()
