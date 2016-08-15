@@ -3,8 +3,6 @@ automatically read unit tests from test library?
 
 -- onlyfailed command line option
 
-perf metrics
-
 init function
     -- string metatable options
 

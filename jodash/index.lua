@@ -4,9 +4,12 @@
 -- by Joseph Tkach
 
 -------------------------------------------------------------------------------
--- TODO
---supend lobal metatable if it exists
---remove _G[__] and restore it at the end
+-- if you hide the global metatable with __metatable, you're going to have a 
+-- bad time
+local globalmt = getmetatable(_G)
+setmetatable(_G, nil)
+local saveOld__ = __
+
 -------------------------------------------------------------------------------
 __ = {}
 local _jo = __
@@ -112,8 +115,8 @@ setmetatable(exports, {
 _jo.marshal = function(A) return A end
 
 --------------------------------------------------------------------------------
--- scrub the global table
-__ = nil
+__ = saveOld__
+setmetatable(_G, globalmt)
 
 -------------------------------------------------------------------------------
 return exports

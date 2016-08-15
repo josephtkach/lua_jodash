@@ -6,7 +6,9 @@ expect = require("junit/expect")
 jo = require("jodash/index")
 
 -------------------------------------------------------------------------------
+junit.init(arg)
 
+-------------------------------------------------------------------------------
 require("tests/chunk"):run()
 require("tests/compact"):run()
 require("tests/concat"):run()
@@ -14,5 +16,5 @@ require("tests/difference"):run()
 require("tests/differenceBy"):run()
 require("tests/differenceWith"):run()
 
-junit:hr()
-print(" ")
+-------------------------------------------------------------------------------
+junit.report()
