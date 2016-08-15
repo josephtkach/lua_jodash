@@ -4,3 +4,9 @@ automatically read unit tests from test library?
 -- onlyfailed command line option
 
 perf metrics
+
+init function
+    -- string metatable options
+
+    --supend lobal metatable if it exists
+    --remove _G[__] and restore it at the end

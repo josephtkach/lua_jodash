@@ -2,8 +2,10 @@
 local jo = __
 
 -------------------------------------------------------------------------------
+-- TODO: does not properly handle numeric indices
 function jo.get(object, path, default, verbose)
-    local paths = path:split('.')
+    path = tostring(path)
+    local paths = jo.strSplit(path, '.')
     for i,v in ipairs(paths) do
         if not type(object) == "table" then 
             return default 

@@ -78,7 +78,7 @@ function tprint (tbl, indent, maxRecursions)
     if not indent then indent = 0 end
    
     for k, v in pairs(tbl) do
-        local formatting = string.rep("  ", indent) .. tostring(k).blue .. ": "
+        local formatting = string.rep("    ", indent) .. tostring(k).blue .. ": "
         -- this only fixes the bug when a table is its own __index, not for more complicated cycles
         if type(v) == "table" then
             print(formatting .."{")

@@ -5,9 +5,9 @@ local exports = {}
 exports.__index = exports
 
 -------------------------------------------------------------------------------
-require("junit/utils")
 require("junit/jstring")
 require("junit/print")
+require("junit/utils")
 
 exports.data = require("junit/data")
 
@@ -22,36 +22,35 @@ end
 -------------------------------------------------------------------------------
 function exports:run()
     exports:hr()
-    print("Running test: " .. self.name.bright)
+    print("\t\t" .. self.name.bright)
     exports:hr()
 
     local orderedTests = self.orderedTests
-    local lastWasFailure = false
 
     for k,v in pairs(orderedTests) do
+        local elapsed = 0
         local report = string.rep(" ", 8) .. v.name.blue .. ": "
 
         local succeeded = xpcall(function()
+            local start = os.time()
             v.func(self.data, self.userData)
+            elapsed = os.time() - start
         end, function(msg)
             report = report .. msg.red
             exports:hr()
             print(report)
             print(" at ")
             print(debug.traceback().red)
-            lastWasFailure = true
             exports:hr()
         end) 
 
         if succeeded then
             local toPad = 50 - report:len()
             report = report .. string.rep(" ", toPad) .. s("Succeeded").green
+            --report = report .. " in " .. elapsed .. "ms"
             print(report)
-            lastWasFailure = false
         end
     end
-    
-    if not lastWasFailure then exports:hr() end
 end
 
 -------------------------------------------------------------------------------
@@ -64,7 +63,7 @@ function exports:new(params)
 
     outmt.__newindex = function(self, key, value)
         if type(value) == "function" then
-            table.insert(outmt.orderedTests, { name = key, func = value })
+            table.insert(self.orderedTests, { name = key, func = value })
         else
             rawset(self, key, value)
         end

@@ -178,21 +178,23 @@ function expectation:toMatchArray(rhs, comparator)
     for k,v in pairs(self.obj) do
         if type(v) == "table" then
             local other = rhs[k]
-            if not type(other) == "table" then 
-                print("type mismatch on key " .. tostring(k))
+
+            local otherIsTable = type(other) == "table"
+            if not otherIsTable then 
+                print("type mismatch on key " .. tostring(k).yellow)
                 return false 
             end
 
             expect.verbose = self.verbose
-            if not expect(v):toMatchArray(other) then
-                print("mismatch in subarray with key " .. tostring(k))
+            if not expect(v):toMatchArray(other, nil) then
+                print("mismatch in subarray with key " .. tostring(k).yellow)
                 return false 
             end
         else
             if not comparator(v, rhs[k]) then
-                print("value mismatch on key " .. tostring(k))
-                print("left " .. tostring(v))
-                print("right " .. tostring(rhs))
+                print("value mismatch on key " .. tostring(k).yellow)
+                print("left " .. tostring(v).yellow)
+                print("right " .. tostring(rhs).yellow)
                 return false
             end
         end

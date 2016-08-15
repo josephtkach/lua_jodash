@@ -11,6 +11,7 @@ local test = junit:new({
 function test.TwoArrays(data, userData)
     local actual = userData.func({2,1}, {2,3})
     local expected = {1}
+
     expect( actual ):toMatchArray( expected )
 end
 

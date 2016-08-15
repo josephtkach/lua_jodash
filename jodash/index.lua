@@ -4,6 +4,7 @@
 -- by Joseph Tkach
 
 -------------------------------------------------------------------------------
+-- TODO
 --supend lobal metatable if it exists
 --remove _G[__] and restore it at the end
 -------------------------------------------------------------------------------
@@ -26,6 +27,7 @@ require("jodash/utils")
 require("jodash/debug")
 require("jodash/safe")
 require("jodash/predicates")
+require("jodash/private")
 
 -------------------------------------------------------------------------------
 local ARRAY_TYPE = 1
@@ -59,6 +61,9 @@ local function getInvoker(key)
         end
         
         local func = retriever[objectType](key, A)
+        -- don't allow access to internal data
+        if not _jo.isFunction(func) then return nil end
+
         local count = select("#", ...)
         if count == 0 then
             out = func(A)

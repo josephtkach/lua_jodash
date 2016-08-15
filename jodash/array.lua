@@ -61,12 +61,10 @@ end
 
 -------------------------------------------------------------------------------
 local function _difference(iteratee, A, ...)
-    iteratee = iteratee or jo.identity
-
     local out = {}
     local test = {}
 
-    local _assign = function(x) 
+    local _assign = function(x)
         test[ iteratee(x) ] = true
     end
 
@@ -75,8 +73,7 @@ local function _difference(iteratee, A, ...)
     end)
 
     array.forEach(A, function(x)
-        x = iteratee(x)
-        if test[x] == nil then
+        if test[iteratee(x)] == nil then
             table.insert(out, x)
         end 
     end)
@@ -89,21 +86,40 @@ end
 -- The order of result values is determined by the order they occur in the 
 -- first array. 
 function array.difference(A, ...)
-    return _difference(nil, A, unpack({...}))
+    return _difference(jo.private.defaultIteratee, A, unpack({...}))
 end
 
 -------------------------------------------------------------------------------
 function array.differenceBy(A, ...)
     local args = {...}
-    local count = #args
-    local last = args[count]
+    local iteratee = jo.private.pullIteratee(args)
+    return _difference(iteratee, A, unpack(args))
+end
 
-    if not jo.isTable(last) then
-        args[count] = nil
-        return _difference(last, A, unpack(args))
+-------------------------------------------------------------------------------
+local function _compareEachWith(lhs, rhsArray, comparator)
+    for i,rhs in ipairs(rhsArray) do
+        if comparator(lhs, rhs) then return true end
     end
-    
-    return _difference(nil, A, unpack(args))
+    return false
+end
+
+-------------------------------------------------------------------------------
+function array.differenceWith(A, ...)
+    local out = {}
+    local args = {...}
+    local comparator = jo.private.pullComparator(args) 
+
+    array.forEach(A, function(lhs)
+        for i,rhs in ipairs(args) do
+            if _compareEachWith(lhs, rhs, comparator) then
+                return 
+            end
+        end
+        table.insert(out, lhs)
+    end)
+
+    return out
 end
 
 -------------------------------------------------------------------------------
