@@ -7,32 +7,15 @@ local private = {}
 jo.private = private
 
 -------------------------------------------------------------------------------
-private.defaultIteratee = jo.identity
-
--------------------------------------------------------------------------------
-local function _resolveLast(args, default, resolver)
+private.pullComparator = function(default, args)
     local count = #args
     local last = args[count]
 
-    if not jo.isTable(last) then
+    if jo.isFunction(last) then
         args[count] = nil
-        return resolver(last)
+        return last 
     end
 
     return default
-end
-
-
--------------------------------------------------------------------------------
-private.pullIteratee = function(args)
-    return _resolveLast( args, private.defaultIteratee, function(last)
-        return jo.isFunction(last) and last 
-            or jo.property(last)
-    end)
-end
-
--------------------------------------------------------------------------------
-private.pullComparator = function(args)
-    return _resolveLast( args, jo.sameValue, jo.identity )
 end
 

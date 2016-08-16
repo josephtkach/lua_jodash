@@ -86,14 +86,21 @@ end
 -- The order of result values is determined by the order they occur in the 
 -- first array. 
 function array.difference(A, ...)
-    return _difference(jo.private.defaultIteratee, A, unpack({...}))
+    return _difference(jo.identity, A, unpack({...}))
 end
 
 -------------------------------------------------------------------------------
 function array.differenceBy(A, ...)
     local args = {...}
-    local iteratee = jo.private.pullIteratee(args)
-    return _difference(iteratee, A, unpack(args))
+    local last = jo.last(args)
+    
+    if jo.isTable(last) then
+        last = nil
+    else
+        args[#args] = nil
+    end
+
+    return _difference(jo.iteratee(last), A, unpack(args))
 end
 
 -------------------------------------------------------------------------------
@@ -108,7 +115,7 @@ end
 function array.differenceWith(A, ...)
     local out = {}
     local args = {...}
-    local comparator = jo.private.pullComparator(args) 
+    local comparator = jo.private.pullComparator(jo.sameValue, args) 
 
     array.forEach(A, function(lhs)
         for i,rhs in ipairs(args) do
@@ -138,6 +145,29 @@ function array.dropRight(A, count)
     for i = 1, count do
         table.insert(out, A[i])
     end
+    return out
+end
+
+-------------------------------------------------------------------------------
+function array.dropRightWhile(A, predicate)
+    predicate = jo.iteratee(predicate)
+    
+    local out = {}
+    count = 0
+
+    local function backwards()
+        for i = #A,1,-1 do
+            count = i
+            if jo.isFalsey(predicate(A[i], i, A)) then return end
+        end
+    end
+
+    backwards()
+
+    for i = 1, count do
+        table.insert(out, A[i])
+    end
+
     return out
 end
 

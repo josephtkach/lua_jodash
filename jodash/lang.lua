@@ -27,10 +27,6 @@ end
 -------------------------------------------------------------------------------
 jo.isArray = _functor({ dangerous = _isArray },
     function(self, A)
-        for k,v in pairs(self) do
-            print(tostring(k) .. " : " .. tostring(v))
-        end
-
         if A == nil or type(A) ~= "table" then return false end
         return self.dangerous(A)
     end
