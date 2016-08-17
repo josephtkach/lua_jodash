@@ -38,23 +38,37 @@ function jo.isEmpty(A)
 end
 
 -------------------------------------------------------------------------------
-function jo.isEqual(lhs, rhs, comparator)
+local function _deepCompare(lhs, rhs, comparator, equiv)
+    -- todo: should compare metatables?
     comparator = comparator or jo.sameValue
-    for k,v in pairs(lhs) do
-        if jo.isTable(v) then
-            local other = rhs[k]
+    local isTable = jo.isTable(lhs)
+    if isTable then
+        if not jo.isTable(rhs) then 
+            return false 
+        end
 
-            if not jo.isTable(other) then 
+        for k,v in pairs(lhs) do
+            if not equiv(v, rhs[k], comparator) then
                 return false 
             end
+        end
+    else
+        return comparator(lhs, rhs)
+    end
 
-            if not jo.isEqual(v, other, comparator) then
-                return false 
-            end
-        else
-            if not comparator(v, rhs[k]) then
-                return false
-            end
+    return true, isTable
+end
+
+-------------------------------------------------------------------------------
+function jo.isEqual(lhs, rhs, comparator)
+    local match, isTable = _deepCompare(lhs, rhs, comparator, jo.isEqual)
+    if not match then
+        return false
+    end
+
+    if isTable then
+        for k,v in pairs(rhs) do
+            if jo.isNil(lhs[k]) then return false end
         end
     end
 
@@ -73,6 +87,11 @@ end
 -------------------------------------------------------------------------------
 function jo.isFunction(A)
     return type(A) == "function"
+end
+
+-------------------------------------------------------------------------------
+function jo.isMatch(lhs, rhs, comparator)
+    return _deepCompare(lhs, rhs, comparator, jo.isMatch)
 end
 
 -------------------------------------------------------------------------------

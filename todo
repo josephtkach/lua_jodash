@@ -1,9 +1,8 @@
 prettify output on unit tests
 automatically read unit tests from test library?
 
+improve targeted verbosity settings
 
 init function
+    -- wrap file-level scope operations in jodash index
     -- string metatable options
-
-    --supend lobal metatable if it exists
-    --remove _G[__] and restore it at the end
