@@ -153,6 +153,10 @@ function array.dropRightWhile(A, predicate)
     predicate = jo.iteratee(predicate)
     
     local out = {}
+    -- the name "count" as opposed to "length" implies something
+    -- pre- rather than descriptive, and as we are attempting to 
+    -- prescribe a property of the right end of the array, (the 
+    -- "length") count feels better than "length". See dropWhile
     count = 0
 
     local function backwards()
@@ -166,6 +170,31 @@ function array.dropRightWhile(A, predicate)
 
     for i = 1, count do
         table.insert(out, A[i])
+    end
+
+    return out
+end
+
+-------------------------------------------------------------------------------
+function array.dropWhile(A, predicate)
+    predicate = jo.iteratee(predicate)
+    
+    local out = {}
+    local i = 1
+    local length = #A
+    -- length feels more descriptive than proscriptive, and as the length
+    -- of the array is changing only artifactually as a result of changing
+    -- the "start" of the array, we used it instead of "count"
+    -- hence there is a jarring asymmetry between the nomenclature of
+    -- dropWhile and dropRightWhile
+
+    while i < length and not jo.isFalsey(predicate(A[i], i, A)) do
+        i = i + 1
+    end
+
+    while i <= length do
+        table.insert(out, A[i])
+        i = i + 1
     end
 
     return out

@@ -18,6 +18,7 @@ require("tests/differenceWith"):run()
 require("tests/drop"):run()
 require("tests/dropRight"):run()
 require("tests/dropRightWhile"):run()
+require("tests/dropWhile"):run()
 
 -------------------------------------------------------------------------------
 junit.report()

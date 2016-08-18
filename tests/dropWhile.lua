@@ -1,42 +1,43 @@
 -------------------------------------------------------------------------------
 -- chunk tests
-local test = junit:new({ name = "Array:DropRightWhile" })
-
+local test = junit:new({ name = "Array:DropWhile" })
 
 local users = {
-  { user = "barney",  active = true  },
+  { user = "barney",  active = false  },
   { user = "fred",    active = false },
-  { user = "pebbles", active = false },
+  { user = "pebbles", active = true },
 }
 
 -------------------------------------------------------------------------------
 function test.Default(data)
-    expect( jo.dropRightWhile(users, function(o) return not o.active end) )
-        :toMatchArray({
-            {user = "barney", active = true} 
-        })
+    local actual = jo.dropWhile(users, function(o) return not o.active end)
+    local expected = {
+        {user = "pebbles", active = true} 
+    }
+
+    expect( actual ):toMatchArray( expected )
 end
 
 -------------------------------------------------------------------------------
 function test.Matches(data)
-    expect( jo.dropRightWhile(users, {user="pebbles", active=false}) )
+    expect( jo.dropWhile(users, {user="barney", active=false}) )
         :toMatchArray({ 
-            {user = "barney", active = true},
             {user = "fred", active = false},
+            {user = "pebbles", active = true},
         })
 end
 
 -------------------------------------------------------------------------------
 function test.MatchesProperty(data)
-    expect( jo.dropRightWhile(users, {"active", false}) )
+    expect( jo.dropWhile(users, {"active", false}) )
         :toMatchArray({ 
-            {user = "barney", active = true},
+            {user = "pebbles", active = true},
         })
 end
 
 -------------------------------------------------------------------------------
 function test.Property(data)
-    expect( jo.dropRightWhile(users, "active") ):toMatchArray( users )
+    expect( jo.dropWhile(users, "active") ):toMatchArray( users )
 end
 
 -------------------------------------------------------------------------------
