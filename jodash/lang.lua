@@ -100,6 +100,11 @@ function jo.isNil(A)
 end
 
 -------------------------------------------------------------------------------
+function jo.isNumber(A)
+    return type(A) == "number"
+end
+
+-------------------------------------------------------------------------------
 function jo.isTable(A)
     return type(A) == "table"
 end

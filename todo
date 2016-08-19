@@ -2,6 +2,7 @@ prettify output on unit tests
 automatically read unit tests from test library?
 
 improve targeted verbosity settings
+implicit chaining
 
 init function
     -- wrap file-level scope operations in jodash index

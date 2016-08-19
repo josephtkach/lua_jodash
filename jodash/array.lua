@@ -201,6 +201,37 @@ function array.dropWhile(A, predicate)
 end
 
 -------------------------------------------------------------------------------
+-- Fills elements of array with value from start up to, but not including, end. 
+-- Note: This mutates the array.
+-------------------------------------------------------------------------------
+-- This function deviates from lodash.fill
+--  in javascript, 0-based arrays, iterated over [0, length)
+--  in lua, 1-based arrays, iterated over [1, length]
+-- I have preserved this convention.
+-- MOREOVER. In javascript, an array can exist of #size and yet
+-- be empty. In lua there is no such thing as an empty array slot,
+-- so in order to simulate the idiom _.fill(Array(3), 2), we support
+-- jo.fill(3, 2), which will cause this method to allocate a new array
+function array.fill(A, value, startPos, endPos)
+    local length
+    if jo.isNumber(A) then
+        length = A
+        A = {}
+    else
+        length = #A
+    end
+
+    -- coerce bounds to integers
+    endPos = math.floor(jo.clamp(endPos or length, length))
+    startPos = math.floor(jo.clamp(startPos or 1, 1, math.huge))
+
+    for i = startPos, endPos do
+        A[i] = value
+    end
+    return A
+end
+
+-------------------------------------------------------------------------------
 function array.filter( A, predicate )
     local output = {}
     array.forEach(A, function(x, k)

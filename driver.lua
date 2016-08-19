@@ -9,6 +9,14 @@ jo = require("jodash/index")
 junit.init(arg)
 
 -------------------------------------------------------------------------------
+function eaprint(actual, expected)
+    print("actual")
+    tprint(actual)    
+    print("expected")
+    tprint(expected)
+end
+
+-------------------------------------------------------------------------------
 require("tests/chunk"):run()
 require("tests/compact"):run()
 require("tests/concat"):run()
@@ -19,6 +27,7 @@ require("tests/drop"):run()
 require("tests/dropRight"):run()
 require("tests/dropRightWhile"):run()
 require("tests/dropWhile"):run()
+require("tests/fill"):run()
 
 -------------------------------------------------------------------------------
 junit.report()

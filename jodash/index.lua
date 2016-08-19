@@ -24,13 +24,14 @@ _jo.array = require("jodash/array")
 _jo.hash = require("jodash/hash")
 
 -- these add to the global object
-require("jodash/lang")
-require("jodash/object")
-require("jodash/utils")
 require("jodash/debug")
-require("jodash/safe")
+require("jodash/lang")
+require("jodash/number")
+require("jodash/object")
 require("jodash/predicates")
 require("jodash/private")
+require("jodash/safe")
+require("jodash/utils")
 
 -------------------------------------------------------------------------------
 local ARRAY_TYPE = 1
