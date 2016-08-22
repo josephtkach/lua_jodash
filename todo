@@ -1,9 +1,13 @@
-prettify output on unit tests
+seriously tho: prettify output on unit tests
 automatically read unit tests from test library?
 
 improve targeted verbosity settings
-implicit chaining
+implicit chaining?
 
 init function
     -- wrap file-level scope operations in jodash index
     -- string metatable options
+
+calculate velocity and ship date
+instrumentation for debugging
+    -- wrap every method in a functor that supports verbosity

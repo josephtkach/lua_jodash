@@ -45,7 +45,12 @@ end
 
 -------------------------------------------------------------------------------
 function expectation:toBe(rhs)
-    return self.obj == rhs
+    local result = self.obj == rhs
+    if not result then 
+        print("Expected: " .. tostring(rhs))
+        print("Actual: " .. tostring(self.obj))
+    end
+    return result
 end
 
 -------------------------------------------------------------------------------

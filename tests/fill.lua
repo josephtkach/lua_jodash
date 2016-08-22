@@ -1,3 +1,4 @@
+
 -------------------------------------------------------------------------------
 -- chunk tests
 local test = junit:new({ name = "Array:Fill" })
@@ -10,6 +11,11 @@ local test = junit:new({ name = "Array:Fill" })
 
 -------------------------------------------------------------------------------
 function test.Default(data)
+    local users = {
+      { user = "barney",  active = true  },
+      { user = "fred",    active = false },
+      { user = "pebbles", active = false },
+    }
     expect( jo.fill({1, 2, 3}, 'a') )
         :toMatchArray( {'a', 'a', 'a'}  )
 end
@@ -39,7 +45,16 @@ function test.StartGTEnd(data)
 end
 
 -------------------------------------------------------------------------------
-function test.PastTheEnd(data)
+function test.StartPastTheEnd(data)
+  local actual = jo.fill({1,2,3}, 'a', math.huge, 4)
+  local expected = {1,2,3}
+
+  expect( actual )
+        :toMatchArray( expected )
+end
+
+-------------------------------------------------------------------------------
+function test.EndPastTheEnd(data)
     expect( jo.fill({1, 2, 3}, 'a',1, math.huge) )
         :toMatchArray( {'a', 'a', 'a'}  )
 end

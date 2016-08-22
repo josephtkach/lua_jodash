@@ -17,7 +17,7 @@ function eaprint(actual, expected)
 end
 
 -------------------------------------------------------------------------------
-require("tests/chunk"):run()
+--[[ require("tests/chunk"):run()
 require("tests/compact"):run()
 require("tests/concat"):run()
 require("tests/difference"):run()
@@ -27,7 +27,8 @@ require("tests/drop"):run()
 require("tests/dropRight"):run()
 require("tests/dropRightWhile"):run()
 require("tests/dropWhile"):run()
-require("tests/fill"):run()
+require("tests/fill"):run() --]]
+require("tests/findIndex"):run()
 
 -------------------------------------------------------------------------------
 junit.report()

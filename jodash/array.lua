@@ -223,12 +223,32 @@ function array.fill(A, value, startPos, endPos)
 
     -- coerce bounds to integers
     endPos = math.floor(jo.clamp(endPos or length, length))
-    startPos = math.floor(jo.clamp(startPos or 1, 1, math.huge))
+    startPos = math.floor(jo.clamp(startPos or 1, 1, length+1))
 
     for i = startPos, endPos do
         A[i] = value
     end
     return A
+end
+
+-------------------------------------------------------------------------------
+-- This method is like _.find except that it returns the index of the first 
+-- element predicate returns truthy for instead of the element itself.
+function array.findIndex(A, predicate, fromIndex)
+    predicate = jo.iteratee(predicate)
+    local length = #A
+
+    if jo.isFalsey(fromIndex) then fromIndex = 1 end
+    if fromIndex > length then return -1 end
+    fromIndex = math.floor(fromIndex) % length
+
+    for i = fromIndex,length do
+        if predicate(A[i]) then
+            return i
+        end
+    end
+
+    return -1
 end
 
 -------------------------------------------------------------------------------

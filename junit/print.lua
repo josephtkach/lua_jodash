@@ -2,6 +2,9 @@
 -------------------------------------------------------------------------------
 -- debug printing
 -------------------------------------------------------------------------------
+local _print = print
+
+-------------------------------------------------------------------------------
 function success(msg)
     print(("SUCCESS: " .. msg).green)
 end
@@ -120,12 +123,33 @@ end
 function table_contents_to_oneliner(table)
     local printedSomething = false
     if not indent then indent = 1 end
-    local output = ""
+    local output = "{ "
     for k, v in pairs(table) do
-        output = output .. tostring(v) .. ", "
-        printedSomething = true
+        output = output .. tostring(k) .."=" .. tostring(v) .. ", "
     end
     
-    if printedSomething == false then output = ("table was empty").red end
+    output = output .. "}"
     return output
+end
+
+--------------------------------------------------------------------------------
+function to_s(...)
+    local args = {...}
+    local toPrint = ""
+
+    for i,v in ipairs(args) do
+        if type(v) == "table" then
+            toPrint = toPrint .. " " .. table_contents_to_oneliner(v)
+        elseif type(v) == "boolean" then
+            toPrint = toPrint .. " BOOL:" .. tostring(v)
+        else
+            toPrint = toPrint .. " " .. tostring(v)
+        end
+    end
+    return toPrint
+end
+
+--------------------------------------------------------------------------------
+function print(...)
+    _print(to_s(unpack({...})))
 end

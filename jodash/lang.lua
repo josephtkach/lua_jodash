@@ -53,7 +53,8 @@ local function _deepCompare(lhs, rhs, comparator, equiv)
             end
         end
     else
-        return comparator(lhs, rhs)
+        local eq = comparator(lhs, rhs)
+        return eq
     end
 
     return true, isTable

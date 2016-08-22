@@ -2,7 +2,6 @@
 -- chunk tests
 local test = junit:new({ name = "Array:DropRightWhile" })
 
-
 local users = {
   { user = "barney",  active = true  },
   { user = "fred",    active = false },
