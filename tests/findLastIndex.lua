@@ -1,12 +1,14 @@
 -------------------------------------------------------------------------------
 -- chunk tests
-local test = junit:new({ name = "Array:FindIndex" })
+local test = junit:new({ name = "Array:FindLastIndex" })
 
 -------------------------------------------------------------------------------
 local users = {
     { user = "barney",  active = false },
     { user = "fred",    active = false, extra = "dat boi" },
-    { user = "pebbles", active = true }
+    { user = "pebbles", active = true },
+    { user = "barney", active = false },
+    { user = "pebbles", active = true },
 }
 
 -------------------------------------------------------------------------------
@@ -16,45 +18,45 @@ end
 
 -------------------------------------------------------------------------------
 function test.Default(data)
-    expect( jo.findIndex(users, finder("barney")) )
-        :toBe( 1 )
+    expect( jo.findLastIndex(users, finder("barney")) )
+        :toBe( 4 )
 end
 
 -------------------------------------------------------------------------------
-function test.HandleNegativeFromIndex(data)
-    expect( jo.findIndex(users, finder("barney"), -1) )
-        :toBe( -1 )
+function test.HandleFromIndexGTLength(data)
+    expect( jo.findLastIndex(users, finder("barney"), 10) )
+        :toBe( 4 )
 end
 
 -------------------------------------------------------------------------------
-function test.TreatFalseyFromIndexAsZero(data)
+function test.TreatFalseyFromIndexAsLength(data)
     for i,v in ipairs(data.allFalseys) do
-        expect( jo.findIndex(users, finder("barney"), v) )
-            :toBe( 1 )
+        expect( jo.findLastIndex(users, finder("barney"), v) )
+            :toBe( 4 )
     end
 end
 
 -------------------------------------------------------------------------------
 function test.CoerceFromIndexToInteger(data)
-    expect( jo.findIndex(users, finder("pebbles"), 1.4) )
+    expect( jo.findLastIndex(users, finder("pebbles"), 3.5) )
         :toBe( 3 )
 end
 
 -------------------------------------------------------------------------------
 function test.MatchesShorthand(data)
-    expect( jo.findIndex(users, {user="pebbles",active=true}) )
-        :toBe( 3 )
+    expect( jo.findLastIndex(users, {user="pebbles",active=true}) )
+        :toBe( 5 )
 end
 
 -------------------------------------------------------------------------------
 function test.MatchesPropertyShorthand(data)
-    expect( jo.findIndex(users, {"active",true}) )
-        :toBe( 3 )
+    expect( jo.findLastIndex(users, {"active",true}) )
+        :toBe( 5 )
 end
 
 -------------------------------------------------------------------------------
 function test.PropertyShorthand(data)
-    expect( jo.findIndex(users, "extra") )
+    expect( jo.findLastIndex(users, "extra") )
         :toBe( 2 )
 end
 

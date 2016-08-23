@@ -240,9 +240,29 @@ function array.findIndex(A, predicate, fromIndex)
 
     if jo.isFalsey(fromIndex) then fromIndex = 1 end
     if fromIndex > length then return -1 end
-    fromIndex = math.floor(fromIndex) % length
+    fromIndex = math.floor(fromIndex) % (length+1)
 
     for i = fromIndex,length do
+        if predicate(A[i]) then
+            return i
+        end
+    end
+
+    return -1
+end
+
+-------------------------------------------------------------------------------
+--This method is like _.findIndex except that it iterates over elements of
+-- the array from right to left.
+function array.findLastIndex(A, predicate, fromIndex)
+    predicate = jo.iteratee(predicate)
+    local length = #A
+
+    if jo.isFalsey(fromIndex) then fromIndex = length end
+    if fromIndex < 0 then return -1 end
+    fromIndex = math.floor(fromIndex) % (length+1)
+
+    for i = fromIndex,1,-1 do
         if predicate(A[i]) then
             return i
         end

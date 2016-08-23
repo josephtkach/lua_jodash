@@ -27,8 +27,9 @@ require("tests/drop"):run()
 require("tests/dropRight"):run()
 require("tests/dropRightWhile"):run()
 require("tests/dropWhile"):run()
-require("tests/fill"):run() --]]
-require("tests/findIndex"):run()
+require("tests/fill"):run() 
+require("tests/findIndex"):run() --]]
+require("tests/findLastIndex"):run()
 
 -------------------------------------------------------------------------------
 junit.report()
