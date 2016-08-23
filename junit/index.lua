@@ -23,6 +23,22 @@ function exports.init(args)
 end
 
 -------------------------------------------------------------------------------
+function exports.testObject(object)
+    for k, v in pairs(object) do
+        if type(v) == "function" then
+            local loaded = nil
+            local found = pcall(function()
+                loaded = require("tests/" .. k)
+            end)
+            if found then loaded:run() end
+        end
+    end
+
+    exports.report()
+    report = {}
+end
+
+-------------------------------------------------------------------------------
 function exports.report()
     exports:hr()
 
