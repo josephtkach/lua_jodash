@@ -297,6 +297,13 @@ function array.flattenDeep( A )
 end
 
 -------------------------------------------------------------------------------
+function array.flattenDepth( A, depth )
+    local output = {}
+    _flatten(A, output, 0, depth or 1)
+    return output
+end
+
+-------------------------------------------------------------------------------
 function array.filter( A, predicate )
     local output = {}
     array.forEach(A, function(x, k)
