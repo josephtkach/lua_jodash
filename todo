@@ -1,5 +1,4 @@
 seriously tho: prettify output on unit tests
-automatically read unit tests from test library?
 
 improve targeted verbosity settings
 implicit chaining?
@@ -9,5 +8,9 @@ init function
     -- string metatable options
 
 calculate velocity and ship date
+
+remember previous run outputs and selectively toggle verbose output for failed tests
 instrumentation for debugging
     -- wrap every method in a functor that supports verbosity
+
+better object level management of unit test harness state

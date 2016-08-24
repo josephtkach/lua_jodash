@@ -76,6 +76,7 @@ end
 -- `indent` sets the initial level of indentation.
 function tprint (tbl, indent, maxRecursions)
     if not tbl then print("table is nil"); return end
+    -- detect empty table
     maxRecursions = maxRecursions or 5
     if indent and indent > maxRecursions then return end
     if not indent then indent = 0 end

@@ -21,6 +21,9 @@ expectation.__index = function(self, key)
 end
 
 -------------------------------------------------------------------------------
+local s = tostring
+
+-------------------------------------------------------------------------------
 local expect = {}
 setmetatable(expect, expect)
 expect.__call = function(self, obj)
@@ -177,21 +180,22 @@ function expectation:toBeEmpty(...)
 end
 
 -------------------------------------------------------------------------------
-function expectation:toMatchArray(rhs, comparator)
+local function deepEqual(lhs, rhs, comparator, verbose)
     comparator = comparator or isEqual
 
-    for k,v in pairs(self.obj) do
+    for k,v in pairs(lhs) do
         if type(v) == "table" then
             local other = rhs[k]
 
             local otherIsTable = type(other) == "table"
             if not otherIsTable then 
                 print("type mismatch on key " .. tostring(k).yellow)
+                print("\tleft is " .. s("table").green)
+                print("\tright is " .. type(other).red)
                 return false 
             end
 
-            expect.verbose = self.verbose
-            if not expect(v):toMatchArray(other, nil) then
+            if not deepEqual(v, other, comparator, verbose) then
                 print("mismatch in subarray with key " .. tostring(k).yellow)
                 return false 
             end
@@ -206,13 +210,25 @@ function expectation:toMatchArray(rhs, comparator)
     end
 
     for k,v in pairs(rhs) do
-        if self.obj[k] == nil then
+        if lhs[k] == nil then
             print("key " .. tostring(k) .. " found in candidate array that did not match original")
             return false 
         end
     end
 
     return true
+end
+
+-------------------------------------------------------------------------------
+function expectation:toMatchArray(rhs, comparator)
+    local isEqual = deepEqual(self.obj, rhs, comparator, self.verbose)
+    if not isEqual then
+        print("expected:")
+        tprint(rhs)
+        print("actual:")
+        tprint(self.obj)
+    end
+    return isEqual
 end
 
 -------------------------------------------------------------------------------

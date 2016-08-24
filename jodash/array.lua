@@ -272,6 +272,31 @@ function array.findLastIndex(A, predicate, fromIndex)
 end
 
 -------------------------------------------------------------------------------
+local function _flatten(A, output, depth, maxDepth)
+    array.forEach(A, function(x)
+        if depth < maxDepth and jo.isArray(x) then
+            _flatten(x, output, depth+1, maxDepth)
+        else
+            table.insert(output, x)
+        end
+    end)
+end
+
+-------------------------------------------------------------------------------
+function array.flatten( A )
+    local output = {}
+    _flatten(A, output, 0, 1)
+    return output
+end
+
+-------------------------------------------------------------------------------
+function array.flattenDeep( A )
+    local output = {}
+    _flatten(A, output, 0, math.huge)
+    return output
+end
+
+-------------------------------------------------------------------------------
 function array.filter( A, predicate )
     local output = {}
     array.forEach(A, function(x, k)

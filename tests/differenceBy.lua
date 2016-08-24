@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- difference tests
 local test = deepCopy( require("tests/difference") )
 test.name = "Array:DifferenceBy"
 test.userData = { func = jo.differenceBy }

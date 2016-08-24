@@ -9,14 +9,6 @@ jo = require("jodash/index")
 junit.init(arg)
 
 -------------------------------------------------------------------------------
-function eaprint(actual, expected)
-    print("actual")
-    tprint(actual)    
-    print("expected")
-    tprint(expected)
-end
-
--------------------------------------------------------------------------------
 -- array tests
 -------------------------------------------------------------------------------
-junit.testObject( require("jodash/array") )
+junit.runTestsForObject( require("jodash/array") )

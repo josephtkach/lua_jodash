@@ -13,6 +13,8 @@ exports.data = require("junit/data")
 -------------------------------------------------------------------------------
 local s = tostring
 local report = {}
+-- todo: better object-level management of state
+local hardBail = false
 
 -------------------------------------------------------------------------------
 function exports.init(args)
@@ -23,12 +25,20 @@ function exports.init(args)
 end
 
 -------------------------------------------------------------------------------
-function exports.testObject(object)
-    for k, v in pairs(object) do
-        if type(v) == "function" then
+function exports.runTestsForObject(object)
+    local alphabetically = {}
+    for k,v in pairs(object) do
+        table.insert(alphabetically, k)
+    end
+
+    table.sort(alphabetically, function(lhs, rhs) return lhs < rhs end)
+
+    for index,name in ipairs(alphabetically) do
+        local toTest = object[name]
+        if type(toTest) == "function" then
             local loaded = nil
             local found = pcall(function()
-                loaded = require("tests/" .. k)
+                loaded = require("tests/" .. name)
             end)
             if found then loaded:run() end
         end
@@ -40,6 +50,7 @@ end
 
 -------------------------------------------------------------------------------
 function exports.report()
+    if hardBail then return end
     exports:hr()
 
     if report.succeeded > 0 then
@@ -74,9 +85,11 @@ function exports:run()
     local succeededCount = 0
     local failedCount = 0
 
-    local happenings = 0
-
     for k,v in pairs(orderedTests) do
+        if hardBail then 
+            return
+        end
+
         local elapsed = 0
         local results = string.rep(" ", 8) .. v.name.blue .. ": "
 
@@ -93,7 +106,12 @@ function exports:run()
             print(" at ")
             print(debug.traceback().red)
             exports:hr()
-        end) 
+
+            if not exports.all then
+                hardBail = true
+                print("Stopping after first failure")
+            end
+        end)
 
         if succeeded then
             succeededCount = succeededCount + 1

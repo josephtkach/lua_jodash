@@ -1,24 +1,23 @@
 -------------------------------------------------------------------------------
-local test = junit:new({ name = "Array:Drop" })
+local test = junit:new({ name = "Array:Flatten" })
 
 -------------------------------------------------------------------------------
 function test.Default(data)
-    expect( jo.drop({1,2,3}) ):toMatchArray( {2,3} )
+    expect( jo.flatten({1, 2, {3, {4}, 5}, 6, {{{7}}} }) )
+        :toMatchArray( {1, 2, 3, {4}, 5, 6, {{7}} } )
 end
 
 -------------------------------------------------------------------------------
-function test.Drop2(data)
-    expect( jo.drop({1,2,3},2) ):toMatchArray( {3} )
+function test.Empty(data)
+    expect( jo.flatten({}) )
+        :toMatchArray( {} )
 end
 
 -------------------------------------------------------------------------------
-function test.Drop5(data)
-    expect( jo.drop({1,2,3},5) ):toMatchArray( {} )
-end
-
--------------------------------------------------------------------------------
-function test.Drop0(data)
-    expect( jo.drop({1,2,3},0) ):toMatchArray( {1,2,3} )
+function test.Object(data)
+    local input = {1, 2, {foo="bar"}, 4}
+    expect( jo.flatten(input) )
+        :toMatchArray( input )
 end
 
 -------------------------------------------------------------------------------

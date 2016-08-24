@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- difference tests
 local test = junit:new({ 
     name = "Array:Difference",
     userData = {
