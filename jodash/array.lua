@@ -304,6 +304,17 @@ function array.flattenDepth( A, depth )
 end
 
 -------------------------------------------------------------------------------
+function array.fromPairs(A)
+    local output = {}
+    array.forEach(A, function(x)
+        for i = 1,2 do
+            table.insert(output, x[i])
+        end
+    end)
+    return output
+end
+
+-------------------------------------------------------------------------------
 function array.filter( A, predicate )
     local output = {}
     array.forEach(A, function(x, k)
