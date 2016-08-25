@@ -315,6 +315,15 @@ function array.fromPairs(A)
 end
 
 -------------------------------------------------------------------------------
+function array.head(A)
+    if not jo.isTable(A) then return nil end
+    return A[1]
+end
+
+-------------------------------------------------------------------------------
+array.first = array.head
+
+-------------------------------------------------------------------------------
 function array.filter( A, predicate )
     local output = {}
     array.forEach(A, function(x, k)
