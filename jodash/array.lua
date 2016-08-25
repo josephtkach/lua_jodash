@@ -272,6 +272,7 @@ function array.findLastIndex(A, predicate, fromIndex)
 end
 
 -------------------------------------------------------------------------------
+-- helper for `flatten` functions
 local function _flatten(A, output, depth, maxDepth)
     array.forEach(A, function(x)
         if depth < maxDepth and jo.isArray(x) then
@@ -283,6 +284,7 @@ local function _flatten(A, output, depth, maxDepth)
 end
 
 -------------------------------------------------------------------------------
+-- Flattens array a single level deep.
 function array.flatten( A )
     local output = {}
     _flatten(A, output, 0, 1)
@@ -290,6 +292,7 @@ function array.flatten( A )
 end
 
 -------------------------------------------------------------------------------
+-- Recursively flattens array.
 function array.flattenDeep( A )
     local output = {}
     _flatten(A, output, 0, math.huge)
@@ -297,6 +300,7 @@ function array.flattenDeep( A )
 end
 
 -------------------------------------------------------------------------------
+-- Recursively flatten array up to depth times.
 function array.flattenDepth( A, depth )
     local output = {}
     _flatten(A, output, 0, depth or 1)
@@ -304,6 +308,7 @@ function array.flattenDepth( A, depth )
 end
 
 -------------------------------------------------------------------------------
+-- The inverse of _.toPairs; this method returns an object composed from key-value pairs.
 function array.fromPairs(A)
     local output = {}
     array.forEach(A, function(x)
@@ -315,6 +320,7 @@ function array.fromPairs(A)
 end
 
 -------------------------------------------------------------------------------
+-- Gets the first element of array.
 function array.head(A)
     if not jo.isTable(A) then return nil end
     return A[1]
@@ -350,9 +356,18 @@ function array.forEach( A, predicate )
 end
 
 -------------------------------------------------------------------------------
+-- Gets the index at which the first occurrence of value is found in array
+-- using == for comparisons. If fromIndex is negative, it’s used as the offset
+-- from the end of array.
 function array.indexOf(A, value, fromIndex)
     local pred = function(x) return value == x end
     return array.findIndex(A, pred, fromIndex)
+end
+
+-------------------------------------------------------------------------------
+-- Gets all but the last element of array.
+function array.initial(A)
+   return array.dropRight(A, 1)
 end
 
 -------------------------------------------------------------------------------
