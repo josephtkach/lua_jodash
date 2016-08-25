@@ -129,6 +129,13 @@ function exports:run()
 end
 
 -------------------------------------------------------------------------------
+function exports:omit(tests)
+    for k,v in pairs(tests) do
+        self[v] = nil
+    end
+end
+
+-------------------------------------------------------------------------------
 function exports:new(params)
     local outmt = deepCopy(params)
     outmt.__index = outmt

@@ -350,12 +350,9 @@ function array.forEach( A, predicate )
 end
 
 -------------------------------------------------------------------------------
-function array.indexOf(A, value)
-    if not A then return end
-    for k,v in pairs(A) do
-        if v == value then return k end
-    end
-    return nil
+function array.indexOf(A, value, fromIndex)
+    local pred = function(x) return value == x end
+    return array.findIndex(A, pred, fromIndex)
 end
 
 -------------------------------------------------------------------------------
