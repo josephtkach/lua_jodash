@@ -102,6 +102,11 @@ function jo.isNil(A)
 end
 
 -------------------------------------------------------------------------------
+function jo.isNotNil(A)
+    return A ~= nil
+end
+
+-------------------------------------------------------------------------------
 function jo.isNumber(A)
     return type(A) == "number"
 end

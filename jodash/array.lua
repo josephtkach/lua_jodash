@@ -31,7 +31,6 @@ function array.chunk(A, size)
         table.insert(last, v)
         counter = counter + 1
     end)
-
     return out
 end
 
@@ -60,7 +59,8 @@ function array.concat(...)
 end
 
 -------------------------------------------------------------------------------
-local function _difference(iteratee, A, ...)
+-- core logic for difference
+local function _difference(A, iteratee, args)
     local out = {}
     local test = {}
 
@@ -68,7 +68,7 @@ local function _difference(iteratee, A, ...)
         test[ iteratee(x) ] = true
     end
 
-    array.forEach({...}, function(arg)
+    array.forEach(args, function(arg)
         jo._.forEach(arg, _assign)
     end)
 
@@ -86,12 +86,12 @@ end
 -- The order of result values is determined by the order they occur in the 
 -- first array. 
 function array.difference(A, ...)
-    return _difference(jo.identity, A, unpack({...}))
+    return _difference(A, jo.identity, {...})
 end
 
 -------------------------------------------------------------------------------
-function array.differenceBy(A, ...)
-    local args = {...}
+-- helper for processing arguments when the last arg is an optional iteratee
+local function _pullLastIfNotTable(args)
     local last = jo.last(args)
     
     if jo.isTable(last) then
@@ -100,7 +100,15 @@ function array.differenceBy(A, ...)
         args[#args] = nil
     end
 
-    return _difference(jo.iteratee(last), A, unpack(args))
+    return last
+end
+
+-------------------------------------------------------------------------------
+function array.differenceBy(A, ...)
+    local args = {...}
+    local last = _pullLastIfNotTable(args)
+
+    return _difference(A, jo.iteratee(last), args)
 end
 
 -------------------------------------------------------------------------------
@@ -371,21 +379,52 @@ function array.initial(A)
 end
 
 -------------------------------------------------------------------------------
-function array.intersection(A, B)
-    local output = {}
-    local B_has = array.keyBy(B, jo.identity)
-    
-    array.forEach(A, function(x) 
-        if B_has[x] then
-             append(output, x) 
+-- core logic for intersection
+local function _intersection(A, iteratee, args)
+    local out = {}
+
+    local sieves = array.map(args, function(x)
+        return array.keyBy(x, iteratee)
+    end)
+
+    function inAll(x)
+        for i,v in ipairs(sieves) do
+            if not v[x] then return false end
+        end
+        return true
+    end
+
+    array.forEach(A, function(x)
+        if inAll(iteratee(x)) then
+            table.insert(out, x)
         end 
     end)
 
-    return output
+    return out
+end
+
+-------------------------------------------------------------------------------
+-- Creates an array of unique values that are included in all given arrays 
+-- using luas innate hashing algorithm for comparisions. The order of result
+-- values is determined by the order they occur in the first array.
+function array.intersection(A, ...)
+    return _intersection(A, jo.identity, {...})
+end
+
+-------------------------------------------------------------------------------
+-- This method is like _.intersection except that it accepts iteratee which is 
+-- invoked for each element of each arrays to generate the criterion by which 
+-- they're compared. Result values are chosen from the first array. The
+-- iteratee is invoked with one argument: (value).
+function array.intersectionBy(A, ...)
+    local args = {...}
+    local last = _pullLastIfNotTable(args)
+    return _intersection(A, jo.iteratee(last), args)
 end
 
 -------------------------------------------------------------------------------
 function array.keyBy( A, predicate )
+    predicate = predicate or jo.identity
     local output = {}
     array.forEach(A, function(v, k)
         local newKey = predicate(v, k)

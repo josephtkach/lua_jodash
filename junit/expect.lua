@@ -22,6 +22,7 @@ end
 
 -------------------------------------------------------------------------------
 local s = tostring
+local isTable = function(x) return type(x) == "table" end
 
 -------------------------------------------------------------------------------
 local expect = {}
@@ -184,11 +185,10 @@ local function deepEqual(lhs, rhs, comparator, verbose)
     comparator = comparator or isEqual
 
     for k,v in pairs(lhs) do
-        if type(v) == "table" then
+        if isTable(v) then
             local other = rhs[k]
 
-            local otherIsTable = type(other) == "table"
-            if not otherIsTable then 
+            if not isTable(other) then 
                 print("type mismatch on key " .. tostring(k).yellow)
                 print("\tleft is " .. s("table").green)
                 print("\tright is " .. type(other).red)
@@ -221,6 +221,12 @@ end
 
 -------------------------------------------------------------------------------
 function expectation:toMatchArray(rhs, comparator)
+    if not self.obj or not isTable(self.obj) then 
+        print("expectation was nil!"); return false end
+
+    if not rhs or not isTable(rhs) then 
+        print("actual was nil!"); return false end
+
     local isEqual = deepEqual(self.obj, rhs, comparator, self.verbose)
     if not isEqual then
         print("expected:")
