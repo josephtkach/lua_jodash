@@ -7,15 +7,26 @@ local private = {}
 jo.private = private
 
 -------------------------------------------------------------------------------
-private.pullComparator = function(default, args)
-    local count = #args
-    local last = args[count]
-
-    if jo.isFunction(last) then
-        args[count] = nil
-        return last 
+local function pullLastIf(args, predicate)
+    local last = jo.last(args)
+    
+    if predicate(last) then
+        args[#args] = nil
+    else
+        last = nil
     end
 
-    return default
+    return last
+end
+
+-------------------------------------------------------------------------------
+-- helper for processing arguments when the last arg is an optional iteratee
+function private.pullLastIfNotTable(args)
+   return pullLastIf(args, function(x) return not jo.isTable(x) end)
+end
+
+-------------------------------------------------------------------------------
+function private.pullLastIfFunction(args)
+   return pullLastIf(args, jo.isFunction)
 end
 

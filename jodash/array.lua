@@ -90,23 +90,9 @@ function array.difference(A, ...)
 end
 
 -------------------------------------------------------------------------------
--- helper for processing arguments when the last arg is an optional iteratee
-local function _pullLastIfNotTable(args)
-    local last = jo.last(args)
-    
-    if jo.isTable(last) then
-        last = nil
-    else
-        args[#args] = nil
-    end
-
-    return last
-end
-
--------------------------------------------------------------------------------
 function array.differenceBy(A, ...)
     local args = {...}
-    local last = _pullLastIfNotTable(args)
+    local last = jo.private.pullLastIfNotTable(args)
 
     return _difference(A, jo.iteratee(last), args)
 end
@@ -123,7 +109,8 @@ end
 function array.differenceWith(A, ...)
     local out = {}
     local args = {...}
-    local comparator = jo.private.pullComparator(jo.sameValue, args) 
+    local comparator = jo.private.pullLastIfFunction(args) 
+    comparator = comparator or jo.sameValue
 
     array.forEach(A, function(lhs)
         for i,rhs in ipairs(args) do
@@ -418,8 +405,30 @@ end
 -- iteratee is invoked with one argument: (value).
 function array.intersectionBy(A, ...)
     local args = {...}
-    local last = _pullLastIfNotTable(args)
+    local last = jo.private.pullLastIfNotTable(args)
     return _intersection(A, jo.iteratee(last), args)
+end
+
+-------------------------------------------------------------------------------
+-- This method is like _.intersection except that it accepts comparator which
+-- is invoked to compare elements of arrays. Result values are chosen from the
+-- first array. The comparator is invoked with two arguments: (arrVal, othVal)
+function array.intersectionWith(A, ...)
+    local out = {}
+    local args = {...}
+    local comparator = jo.private.pullLastIfFunction(args) 
+    comparator = comparator or jo.sameValue
+
+    array.forEach(A, function(lhs)
+        for i,rhs in ipairs(args) do
+            if not _compareEachWith(lhs, rhs, comparator) then
+                return 
+            end
+        end
+        table.insert(out, lhs)
+    end)
+
+    return out
 end
 
 -------------------------------------------------------------------------------
