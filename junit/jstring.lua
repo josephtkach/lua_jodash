@@ -34,12 +34,14 @@ local colorKeys = {
 	whitebg   = 47
 }
 
+-------------------------------------------------------------------------------
 local escapeString = string.char(27) .. '[%dm'
 
 for k,v in pairs(colorKeys) do
   colorKeys[k] = escapeString:format(v)
 end
 
+-------------------------------------------------------------------------------
 getmetatable("").__index = function(str,i)
     if type(i) == 'number' then
         return string.sub(str,i,i)
@@ -49,3 +51,60 @@ getmetatable("").__index = function(str,i)
         return string[i]
     end
 end
+
+-------------------------------------------------------------------------------
+red     = function(str) return tostring(str).red end
+green   = function(str) return tostring(str).green end
+yellow  = function(str) return tostring(str).yellow end
+blue    = function(str) return tostring(str).blue end
+magenta = function(str) return tostring(str).magenta end
+cyan    = function(str) return tostring(str).cyan end
+white   = function(str) return tostring(str).white end
+
+-------------------------------------------------------------------------------
+function string.split(str, delim, maxNb)
+       if delim == '.' then delim = '%.' end
+    -- Eliminate bad cases...
+    if string.find(str, delim) == nil then
+        return { str }
+    end
+    if maxNb == nil or maxNb < 1 then
+        maxNb = 0    -- No limit
+    end
+    local result = {}
+    local pat = "(.-)" .. delim .. "()"
+    local nb = 0
+    local lastPos
+    for part, pos in gfind(str, pat) do
+        nb = nb + 1
+        result[nb] = part
+        lastPos = pos
+        if nb == maxNb then break end
+    end
+    -- Handle the last field
+    if nb ~= maxNb then
+        result[nb + 1] = string.sub(str, lastPos)
+    end
+    return result
+end
+
+-------------------------------------------------------------------------------
+--http://lua-users.org/wiki/StringRecipes
+-------------------------------------------------------------------------------
+function string.wrap(str, limit, indent, indent1)
+    indent = indent or 0
+    indent1 = indent1 or indent
+    limit = limit or 80
+    local here = 1-indent1
+    
+    return string.rep(" ",indent1)..str:gsub("(%s+)()(%S+)()", 
+        function(sp, st, word, fi)
+            if fi-here > limit then
+                here = st - indent
+                return "\n"..string.rep(" ", indent)..word
+            end
+        end
+    )
+
+end
+

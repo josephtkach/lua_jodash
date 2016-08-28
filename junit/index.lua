@@ -8,6 +8,8 @@ exports.__index = exports
 require("junit/jstring")
 require("junit/print")
 require("junit/utils")
+local commandLine = require("junit/commandLine")
+
 exports.data = require("junit/data")
 
 -------------------------------------------------------------------------------
@@ -18,20 +20,7 @@ local hardBail = false
 
 -------------------------------------------------------------------------------
 function exports.init(args)
-    -- parse args. plenty of TODO here
-    -- like move this to its own file
-    -- make args more n*x style
-    -- use a lookup table
-    -- better control for verbosity
-    for i,v in pairs(args) do
-        if v == "clear" then
-            pcall(function() 
-                os.execute([[osascript -e 'if application "iTerm" is frontmost then tell application "System Events" to keystroke "k" using command down']])
-            end)
-        else
-            if not exports[v] then exports[v] = true end
-        end
-    end
+    commandLine.parse(exports, args)
 end
 
 -------------------------------------------------------------------------------
