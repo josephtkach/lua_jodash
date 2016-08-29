@@ -1,13 +1,4 @@
-local red     = function(str) return tostring(str).red end
-local green   = function(str) return tostring(str).green end
-local yellow  = function(str) return tostring(str).yellow end
-local blue    = function(str) return tostring(str).blue end
-local magenta = function(str) return tostring(str).magenta end
-local cyan    = function(str) return tostring(str).cyan end
-local white   = function(str) return tostring(str).white end
-
--------------------------------------------------------------------------------
-local print = function() end
+------------------------------------------------------------------------------- local print = function() end
 
 -------------------------------------------------------------------------------
 -- from http://lua-users.org/wiki/CopyTable

@@ -32,6 +32,7 @@ lookup.help = function(junit, extra)
     
     title("verbose")
     body("Show verbose output")
+    print(" ")
 end
 
 -------------------------------------------------------------------------------
