@@ -122,7 +122,6 @@ end
 
 --------------------------------------------------------------------------------
 function table_contents_to_oneliner(table)
-    local printedSomething = false
     if not indent then indent = 1 end
     local output = "{ "
     for k, v in pairs(table) do

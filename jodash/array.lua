@@ -3,12 +3,13 @@
 -------------------------------------------------------------------------------
 local array = {}
 local jo = __
+local _insert = table.insert -- optimization
 
 -------------------------------------------------------------------------------
 -- mine
 function array.append(A, x)
     if not A then A = {} end
-    table.insert(A, x)
+    _insert(A, x)
     return A
 end
 
@@ -24,11 +25,11 @@ function array.chunk(A, size)
     array.forEach(A, function(v, k)
         if counter > size then
             last = {}
-            table.insert(out, last)
+            _insert(out, last)
             counter = 1
         end
 
-        table.insert(last, v)
+        _insert(last, v)
         counter = counter + 1
     end)
     return out
@@ -51,7 +52,7 @@ function array.concat(...)
         if jo.isTable(arg) then
             array.forEach(arg, _append)
         else
-            table.insert(out, arg)
+            _insert(out, arg)
         end
     end)
 
@@ -74,7 +75,7 @@ local function _difference(A, iteratee, args)
 
     array.forEach(A, function(x)
         if test[iteratee(x)] == nil then
-            table.insert(out, x)
+            _insert(out, x)
         end 
     end)
 
@@ -118,7 +119,7 @@ function array.differenceWith(A, ...)
                 return 
             end
         end
-        table.insert(out, lhs)
+        _insert(out, lhs)
     end)
 
     return out
@@ -128,7 +129,7 @@ end
 function array.drop(A, count)
     local out = {}
     for i = 1 + (count or 1), #A do
-        table.insert(out, A[i])
+        _insert(out, A[i])
     end
     return out
 end
@@ -138,7 +139,7 @@ function array.dropRight(A, count)
     local out = {}
     count = #A - (count or 1)
     for i = 1, count do
-        table.insert(out, A[i])
+        _insert(out, A[i])
     end
     return out
 end
@@ -164,7 +165,7 @@ function array.dropRightWhile(A, predicate)
     backwards()
 
     for i = 1, count do
-        table.insert(out, A[i])
+        _insert(out, A[i])
     end
 
     return out
@@ -188,7 +189,7 @@ function array.dropWhile(A, predicate)
     end
 
     while i <= length do
-        table.insert(out, A[i])
+        _insert(out, A[i])
         i = i + 1
     end
 
@@ -273,7 +274,7 @@ local function _flatten(A, output, depth, maxDepth)
         if depth < maxDepth and jo.isArray(x) then
             _flatten(x, output, depth+1, maxDepth)
         else
-            table.insert(output, x)
+            _insert(output, x)
         end
     end)
 end
@@ -308,7 +309,7 @@ function array.fromPairs(A)
     local output = {}
     array.forEach(A, function(x)
         for i = 1,2 do
-            table.insert(output, x[i])
+            _insert(output, x[i])
         end
     end)
     return output
@@ -328,7 +329,7 @@ array.first = array.head
 function array.filter( A, predicate )
     local output = {}
     array.forEach(A, function(x, k)
-        if predicate(x, k, A) then table.insert(output, x) end
+        if predicate(x, k, A) then _insert(output, x) end
     end)
     return output
 end
@@ -383,7 +384,7 @@ local function _intersection(A, iteratee, args)
 
     array.forEach(A, function(x)
         if inAll(iteratee(x)) then
-            table.insert(out, x)
+            _insert(out, x)
         end 
     end)
 
@@ -425,9 +426,58 @@ function array.intersectionWith(A, ...)
                 return 
             end
         end
-        table.insert(out, lhs)
+        _insert(out, lhs)
     end)
 
+    return out
+end
+
+
+--------------------------------------------------------------------------------
+-- helper for array.join
+local function _coerceToString(A)
+    if not jo.isTable(A) then return tostring(A) end
+
+    local key, value
+    local output = "{"
+
+    local function iterate()
+        key, value = next(A, key)
+    end
+
+    local function write(sep)
+        output = output .. sep .. _coerceToString(key) .."=" .. _coerceToString(value)
+    end
+
+    iterate()
+    if key then
+        write("")
+        iterate()
+
+        while key do
+            write(",")
+            iterate()
+        end
+    end
+
+    output = output .. "}"
+    return output
+end
+
+-------------------------------------------------------------------------------
+-- built in table.concat is much faster than this but it doesn't handle nested
+-- tables, because lol. If you know there are no tables, you should use
+-- table.concat
+function array.join(A, separator)
+    local length = #A
+    if length == 0 then return "" end
+    
+    separator = separator or ','
+
+    local out = _coerceToString(A[1])
+    for i = 2,#A do
+        out = out .. separator .. _coerceToString(A[i])
+    end
     return out
 end
 
@@ -453,7 +503,7 @@ end
 function array.map( A, predicate )
     local output = {}
     for i,v in ipairs(A) do
-        table.insert(output, predicate(v, i))
+        _insert(output, predicate(v, i))
     end
     return output
 end
@@ -507,15 +557,15 @@ function array.remove(A, predicate)
     array.forEach(A, function(x, k)
         A[k] = nil
         if predicate(x, k) then 
-            table.insert(removed, x)
+            _insert(removed, x)
         else
-            table.insert(intermediate, x)
+            _insert(intermediate, x)
         end
     end)
 
     local newCount = #intermediate
     for i = 1, newCount do
-        table.insert(A, intermediate[i])
+        _insert(A, intermediate[i])
     end
 
     return removed
@@ -553,7 +603,7 @@ function array.slice(A, count)
     
     for i = 1, count do
         if not A[i] then return output end
-        table.insert(output, A[i])
+        _insert(output, A[i])
     end
 
     return output
@@ -564,7 +614,7 @@ end
 function array.splat(count, value)
     local A = {}
     for i = 1,count do
-        table.insert(A, value)
+        _insert(A, value)
     end
     return A
 end
