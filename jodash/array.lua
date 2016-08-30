@@ -493,8 +493,7 @@ function array.keyBy( A, predicate )
 end
 
 -------------------------------------------------------------------------------
-function jo.last(A)
-    -- assumes a continuous array
+function array.last(A)
     if not A then return nil end
     return A[#A]
 end

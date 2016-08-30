@@ -8,7 +8,7 @@ jo.private = private
 
 -------------------------------------------------------------------------------
 local function pullLastIf(args, predicate)
-    local last = jo.last(args)
+    local last = jo.array.last(args)
     
     if predicate(last) then
         args[#args] = nil
