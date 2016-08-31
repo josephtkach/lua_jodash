@@ -499,6 +499,13 @@ function array.last(A)
 end
 
 -------------------------------------------------------------------------------
+function array.lastIndexOf(A, value, fromIndex)
+    -- todo: use a partial
+    local pred = function(x) return value == x end 
+    return array.findLastIndex(A, pred, fromIndex)
+end
+
+-------------------------------------------------------------------------------
 function array.map( A, predicate )
     local output = {}
     for i,v in ipairs(A) do
