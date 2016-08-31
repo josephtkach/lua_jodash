@@ -515,35 +515,12 @@ function array.map( A, predicate )
 end
 
 -------------------------------------------------------------------------------
-local function modularCount(A, count)
-    local length = array.size(A)
-
-    if count < 0 then
-        count = count % #A
-    end
-
-    if count == 0 then 
-        count = #A
-    end
-
-    return count
-end
-
--------------------------------------------------------------------------------
-function array.nth(A, index, action)
+function array.nth(A, index)
     if not A then return nil end
-    local index = modularCount(A, index)
 
-    local count = 1
-    for k,v in pairs(A) do
-        if count == index then
-            if action then return action(v) end
-            return v
-        end 
-        count = count + 1
-    end
-
-    return nil
+    local length = #A
+    if index < 0 then index = index % (length + 1) end
+    return A[index]
 end
 
 -------------------------------------------------------------------------------
