@@ -14,3 +14,4 @@ instrumentation for debugging
     -- wrap every method in a functor that supports verbosity
 
 better object level management of unit test harness state
+better error when user accesses a nil function on root object

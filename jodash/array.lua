@@ -524,19 +524,29 @@ function array.nth(A, index)
 end
 
 -------------------------------------------------------------------------------
-function array.pull(A, ...)
-    return array.pullAll(A, {...})
-end
-
--------------------------------------------------------------------------------
-function array.pullAll(A, values)
+local function _pullAll(A, values, iteratee)
     -- todo: performance testing
-    local intermediate = array.difference(A, values)
+    local intermediate = array.differenceBy(A, values, iteratee)
     local length = #A
     for i = 1, length do
         A[i] = intermediate[i]
     end
     return A
+end
+
+-------------------------------------------------------------------------------
+function array.pull(A, ...)
+    return _pullAll(A, {...})
+end
+
+-------------------------------------------------------------------------------
+function array.pullAll(A, values)
+    return _pullAll(A, values)
+end
+
+-------------------------------------------------------------------------------
+function array.pullAllBy(A, values, iteratee)
+    return _pullAll(A, values, iteratee)
 end
 
 -------------------------------------------------------------------------------
