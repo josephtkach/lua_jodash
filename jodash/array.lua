@@ -524,6 +524,17 @@ function array.nth(A, index)
 end
 
 -------------------------------------------------------------------------------
+function array.pull(A, ...)
+    -- todo: performance testing
+    local intermediate = array.difference(A, {...})
+    local length = #A
+    for i = 1, length do
+        A[i] = intermediate[i]
+    end
+    return A
+end
+
+-------------------------------------------------------------------------------
 function array.reduce(A, accumulator, predicate)
     for k,v in pairs(A) do
         accumulator = predicate(v, accumulator)
