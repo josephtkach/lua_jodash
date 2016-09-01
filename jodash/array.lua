@@ -525,8 +525,13 @@ end
 
 -------------------------------------------------------------------------------
 function array.pull(A, ...)
+    return array.pullAll(A, {...})
+end
+
+-------------------------------------------------------------------------------
+function array.pullAll(A, values)
     -- todo: performance testing
-    local intermediate = array.difference(A, {...})
+    local intermediate = array.difference(A, values)
     local length = #A
     for i = 1, length do
         A[i] = intermediate[i]
