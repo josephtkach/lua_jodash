@@ -7,9 +7,9 @@ jo.predicates = {}
 jo.predicates.executeAll = function(x) x() end
 
 jo.reductors = {}
-jo.reductors.add = function(v, accumulator) return v + accumulator end
-jo.reductors.booleanAnd = function(v, accumulator) return v and accumulator end
-jo.reductors.booleanOr = function(v, accumulator) return v or accumulator end
+jo.reductors.add = function(x, accumulator) return x + accumulator end
+jo.reductors.booleanAnd = function(x, accumulator) return x and accumulator end
+jo.reductors.booleanOr = function(x, accumulator) return x or accumulator end
 
 jo.filters = {}
 jo.filters.nonEmptyString = function(entry) return not isEmptyStr(entry) end

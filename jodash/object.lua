@@ -23,16 +23,16 @@ local function assign_inner(A, B, allowOverwrite)
     if not A then A = {} end
     if not B then return A end
     
-    hash.forEach(B, function(v, k)
+    hash.forEach(B, function(x, k)
         local rhs = A[k]
         if rhs then
             if isTable(rhs) then
-                A[k] = assign_inner(v, rhs, allowOverwrite)
+                A[k] = assign_inner(x, rhs, allowOverwrite)
             elseif allowOverwrite then
-                A[k] = v 
+                A[k] = x 
             end
         else
-            A[k] = v 
+            A[k] = x
         end
     end)
 

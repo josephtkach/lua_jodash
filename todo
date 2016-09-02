@@ -1,4 +1,7 @@
 seriously tho: prettify output on unit tests
+convention: predicates should be arged like function(x,k)
+
+hierarchy for test folders/objects
 
 improve targeted verbosity settings
 implicit chaining?

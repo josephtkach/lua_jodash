@@ -8,9 +8,9 @@ local jo = __
 function hash.differenceKeys(A, B)    -- the set of all B not in A
     local output = {}
 
-    hash.forEach(B, function(v, k)
+    hash.forEach(B, function(x, k)
         if A[k] == nil then
-            output[k] = v
+            output[k] = x
         end
     end)
 

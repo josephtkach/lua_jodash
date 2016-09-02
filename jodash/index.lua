@@ -66,7 +66,10 @@ local function getInvoker(key)
         
         local func = retriever[objectType](key, A)
         -- don't allow access to internal data
-        if not _jo.isFunction(func) then return nil end
+        if not _jo.isFunction(func) then 
+            assert(false, "Invalid key: " .. tostring(key))
+            return nil 
+        end
 
         local count = select("#", ...)
         if count == 0 then

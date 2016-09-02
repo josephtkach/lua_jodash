@@ -22,14 +22,14 @@ function array.chunk(A, size)
     local last = nil
     local counter = size+1
 
-    array.forEach(A, function(v, k)
+    array.forEach(A, function(x, k)
         if counter > size then
             last = {}
             _insert(out, last)
             counter = 1
         end
 
-        _insert(last, v)
+        _insert(last, x)
         counter = counter + 1
     end)
     return out
@@ -485,9 +485,9 @@ end
 function array.keyBy( A, predicate )
     predicate = predicate or jo.identity
     local output = {}
-    array.forEach(A, function(v, k)
-        local newKey = predicate(v, k)
-        output[newKey] = v
+    array.forEach(A, function(x, k)
+        local newKey = predicate(x, k)
+        output[newKey] = x
     end)
     return output
 end
@@ -524,13 +524,19 @@ function array.nth(A, index)
 end
 
 -------------------------------------------------------------------------------
+-- overwrites A with a shallow copy of B
+local function _overWrite(A, B)
+    local length = #A
+    for i = 1, length do
+        A[i] = B[i]
+    end
+end
+
+-------------------------------------------------------------------------------
 local function _pullAll(A, values, differenceFunc, auxFunc)
     -- todo: performance testing?
     local intermediate = differenceFunc(A, values, auxFunc)
-    local length = #A
-    for i = 1, length do
-        A[i] = intermediate[i]
-    end
+    _overWrite(A, intermediate)
     return A
 end
 
@@ -552,6 +558,22 @@ end
 -------------------------------------------------------------------------------
 function array.pullAllWith(A, values, comparator)
     return _pullAll(A, values, array.differenceWith, comparator)
+end
+
+-------------------------------------------------------------------------------
+function array.pullAt(A, indices)
+    indices = array.keyBy(indices)
+    local removed = {}
+
+    local intermediate = array.filter(A, function(x, k)
+        if indices[k] then
+            _insert(removed, x)
+            return false
+        end
+        return true
+    end)
+    _overWrite(A, intermediate)
+    return removed
 end
 
 -------------------------------------------------------------------------------
