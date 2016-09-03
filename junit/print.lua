@@ -10,9 +10,12 @@ function success(msg)
 end
 
 -------------------------------------------------------------------------------
-function warn(msg)
+function warn(msg, showStack)
     print(("WARNING: " .. msg).yellowbg)
-    print(debug.traceback().yellow)
+
+    if showStack then
+        print(debug.traceback().yellow)
+    end
 end
 
 -------------------------------------------------------------------------------

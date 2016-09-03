@@ -586,13 +586,14 @@ function array.reduce(A, accumulator, predicate)
 end
 
 -------------------------------------------------------------------------------
-function array.remove(A, predicate)
+function array.remove(A, iteratee)
+    iteratee = jo.iteratee(iteratee)
     local removed = {}
     local intermediate = {}
 
     array.forEach(A, function(x, k)
         A[k] = nil
-        if predicate(x, k) then 
+        if iteratee(x, k, A) then 
             _insert(removed, x)
         else
             _insert(intermediate, x)

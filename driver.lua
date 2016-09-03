@@ -11,4 +11,7 @@ junit.init(arg)
 -------------------------------------------------------------------------------
 -- array tests
 -------------------------------------------------------------------------------
-junit.runTestsForObject( require("jodash/array") )
+junit.testModule({
+    name = "array",
+    object = require("jodash/array"),
+})

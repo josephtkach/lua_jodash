@@ -40,7 +40,7 @@ end
 -------------------------------------------------------------------------------
 local function _deepCompare(lhs, rhs, comparator, equiv)
     -- todo: should compare metatables?
-    -- todo: handle loops
+    -- todo: handle cyclic graphs
     comparator = comparator or jo.sameValue
     local isTable = jo.isTable(lhs)
     if isTable then

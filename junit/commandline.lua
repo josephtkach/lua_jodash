@@ -8,7 +8,7 @@ local lookup = {}
 
 -------------------------------------------------------------------------------
 local function flag(name)
-    lookup[name] = function(junit, extra)
+    lookup[name] = function(junit, subParams)
         junit[name] = true
     end
 end
@@ -18,7 +18,7 @@ local title = function(s) print(string.rep(" ", 4) .. green(s)) end
 local body = function(s) print( string.wrap(s, 80, 8 ) ) end
 
 -------------------------------------------------------------------------------
-lookup.help = function(junit, extra)
+lookup.help = function(junit, subParams)
     junit.hr()
     
     title("all")
@@ -36,7 +36,7 @@ lookup.help = function(junit, extra)
 end
 
 -------------------------------------------------------------------------------
-lookup.clear = function(junit, extra)
+lookup.clear = function(junit, subParams)
     -- support other OS besides osx?
     pcall(function() 
         os.execute([[osascript -e 'if application "iTerm" is frontmost then tell application "System Events" to keystroke "k" using command down']])
@@ -44,8 +44,37 @@ lookup.clear = function(junit, extra)
 end
 
 -------------------------------------------------------------------------------
+lookup.only = function(junit, subParams)
+    junit.expandWhitelist(subParams:split(","))
+end
+
+-------------------------------------------------------------------------------
 flag("all")
 flag("verbose")
+
+-------------------------------------------------------------------------------
+local function processArg(junit, v)
+    local argName = v
+    local subParams = nil
+
+    local tokenized = v:split("=")
+    local count = #tokenized
+
+    if count > 2 then
+        warn("malformed argument string: " .. v)
+        return
+    end
+
+    if #tokenized > 1 then
+        argName = tokenized[1]
+        subParams = tokenized[2]
+    end
+
+    local processor = lookup[argName]
+    if processor then
+        processor(junit, subParams)
+    end
+end
 
 -------------------------------------------------------------------------------
 function commandLine.parse(junit, args)
@@ -53,10 +82,7 @@ function commandLine.parse(junit, args)
         -- make args more n*x style
      -- better control for verbosity
     for i,v in pairs(args) do
-        local processor = lookup[v]
-        if processor then
-            processor(junit, v)
-        end
+        processArg(junit, v)
     end
 end
 

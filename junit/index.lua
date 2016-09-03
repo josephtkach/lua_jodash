@@ -24,27 +24,63 @@ function exports.init(args)
 end
 
 -------------------------------------------------------------------------------
-function exports.runTestsForObject(object)
+function exports.expandWhitelist(tests)
+    local whitelist = {}
+
+    for _,test in pairs(tests) do
+        local path = test:split(".")
+
+        local iter = whitelist
+        for i = 1,#path do
+            local key = path[i]
+            if not iter[key] then iter[key] = {} end
+            iter = iter[key]
+        end
+    end
+
+    exports.whitelist = whitelist
+end
+
+-------------------------------------------------------------------------------
+function exports.testModule(args)
+    local moduleName = args.name
+    local obj = args.object
+
+    local currentModule = exports.whitelist and exports.whitelist[moduleName]
+    if exports.whitelist and not currentModule then return end
+
     local alphabetically = {}
-    for k,v in pairs(object) do
+    for k,v in pairs(obj) do
         table.insert(alphabetically, k)
     end
 
     table.sort(alphabetically, function(lhs, rhs) return lhs < rhs end)
 
-    for index,name in ipairs(alphabetically) do
-        local toTest = object[name]
-        if type(toTest) == "function" then
-            local loaded = nil
-            local found = pcall(function()
-                loaded = require("tests/" .. name)
-            end)
-            if found then loaded:run() end
+    local function doTestMethod(methodName)
+        local toTest = obj[methodName]
+       
+        if type(toTest) ~= "function" 
+            or (exports.whitelist and not currentModule[methodName]) then 
+            return 
         end
+
+        local loaded = nil
+        local found = pcall(function()
+            loaded = require("tests/" .. methodName)
+        end)
+
+        exports.whitelistTests = currentModule[methodName]
+        if found then loaded:run() end
+    end
+
+
+    for index,methodName in ipairs(alphabetically) do
+       doTestMethod(methodName)
     end
 
     exports.report()
     report = {}
+    exports.whitelistTests = nil
 end
 
 -------------------------------------------------------------------------------
@@ -77,6 +113,14 @@ function exports:printHeader()
 end
 
 -------------------------------------------------------------------------------
+local RESULT = 
+{
+    SKIPPED = 1,
+    SUCCESS = 2,
+    FAILURE = 3,
+}
+
+-------------------------------------------------------------------------------
 function exports:run()
     if exports.verbose then self:printHeader() end
 
@@ -92,11 +136,15 @@ function exports:run()
         local elapsed = 0
         local results = string.rep(" ", 8) .. v.name.blue .. ": "
 
-        local succeeded = xpcall(function()
+        local outcome = RESULT.SKIPPED
+
+        local function try()
             local start = os.time()
             v.func(self.data, self.userData)
             elapsed = os.time() - start
-        end, function(msg)
+        end
+
+        local function catch(msg)
             if not verbose then self:printHeader() end
             failedCount = failedCount + 1
             results = results .. msg.red
@@ -110,9 +158,16 @@ function exports:run()
                 hardBail = true
                 print("Stopping after first failure")
             end
-        end)
 
-        if succeeded then
+            outcome = RESULT.FAILURE
+        end
+
+        if exports.whitelistTests == nil
+            or exports.whitelistTests[v.name] then
+            if xpcall(try, catch) then outcome = RESULT.SUCCESS end
+        end
+
+        if outcome == RESULT.SUCCESS then
             succeededCount = succeededCount + 1
             if exports.verbose then
                 local toPad = 50 - results:len()

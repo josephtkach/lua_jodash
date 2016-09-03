@@ -62,6 +62,11 @@ cyan    = function(str) return tostring(str).cyan end
 white   = function(str) return tostring(str).white end
 
 -------------------------------------------------------------------------------
+-- compatibility
+local gfind = string.gfind
+if _VERSION == "Lua 5.2" then gfind = string.gmatch end
+
+-------------------------------------------------------------------------------
 function string.split(str, delim, maxNb)
        if delim == '.' then delim = '%.' end
     -- Eliminate bad cases...
