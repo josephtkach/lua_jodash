@@ -609,6 +609,19 @@ function array.remove(A, iteratee)
 end
 
 -------------------------------------------------------------------------------
+function array.reverse(A)
+    local length = #A
+    local halfLength = math.floor(length/2)
+
+    for i = 1, halfLength do
+        A[i], A[length] = A[length], A[i]
+        length = length-1
+    end
+
+    return A
+end
+
+-------------------------------------------------------------------------------
 function array.sample(A)
     return array.sampleSlice(A, 1, #A)
 end
