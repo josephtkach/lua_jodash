@@ -69,7 +69,7 @@ function exports.testModule(args)
             loaded = require("tests/" .. methodName)
         end)
 
-        exports.whitelistTests = currentModule[methodName]
+        exports.whitelistTests = currentModule and currentModule[methodName]
         if found then loaded:run() end
     end
 

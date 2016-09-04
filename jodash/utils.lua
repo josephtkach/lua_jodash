@@ -30,7 +30,7 @@ end
 function jo.matchesProperty(path, sourceValue)
     -- todo: implement this in terms of `partial`
     return function(A)
-        return jo.isEqual(jo.get(A, path), sourceValue)
+        return jo.isMatch(sourceValue, jo.get(A, path))
     end
 end
 
@@ -38,7 +38,7 @@ end
 function jo.matches(x)
     -- todo: implement this in terms of `partial`
     return function(A)
-        return jo.isMatch(A, x)
+        return jo.isMatch(x, A)
     end
 end
 
