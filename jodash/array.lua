@@ -493,12 +493,15 @@ function array.keyBy( A, predicate )
 end
 
 -------------------------------------------------------------------------------
+-- Gets the last element of A.
 function array.last(A)
     if not A then return nil end
     return A[#A]
 end
 
 -------------------------------------------------------------------------------
+-- This method is like _.indexOf except that it iterates over elements of A
+-- from right to left.
 function array.lastIndexOf(A, value, fromIndex)
     -- todo: use a partial
     local pred = function(x) return value == x end 
@@ -515,12 +518,20 @@ function array.map( A, predicate )
 end
 
 -------------------------------------------------------------------------------
+-- helper for calculating array positions
+local function _arrayPosition(index, length)
+    index = math.floor(index)
+    if index < 0 then index = index % (length + 1) end
+    return index
+end
+
+-------------------------------------------------------------------------------
+-- Gets the element at index n of A. If n is negative, the nth element 
+-- from the end is returned.
 function array.nth(A, index)
     if not A then return nil end
-
-    local length = #A
-    if index < 0 then index = index % (length + 1) end
-    return A[index]
+    index = _arrayPosition(index, #A)
+    return A[index] 
 end
 
 -------------------------------------------------------------------------------
@@ -533,6 +544,7 @@ local function _overWrite(A, B)
 end
 
 -------------------------------------------------------------------------------
+-- helper for pull methods
 local function _pullAll(A, values, differenceFunc, auxFunc)
     -- todo: performance testing?
     local intermediate = differenceFunc(A, values, auxFunc)
@@ -541,26 +553,43 @@ local function _pullAll(A, values, differenceFunc, auxFunc)
 end
 
 -------------------------------------------------------------------------------
+-- Removes all given values from array
+-- Note: Unlike _.without, this method mutates array. Use _.remove to remove 
+-- elements from an array by predicate.
 function array.pull(A, ...)
     return _pullAll(A, {...}, array.difference)
 end
 
 -------------------------------------------------------------------------------
+-- This method is like _.pull except that it accepts an array of values to 
+-- remove. 
+-- Note: Unlike _.difference, this method mutates array.
 function array.pullAll(A, values)
     return _pullAll(A, values, array.difference)
 end
 
 -------------------------------------------------------------------------------
+-- This method is like _.pullAll except that it accepts iteratee which is 
+-- invoked for each element of array and values to generate the criterion by 
+-- which they're compared. The iteratee is invoked with one argument: (value). 
+-- Note: Unlike _.differenceBy, this method mutates array.
 function array.pullAllBy(A, values, iteratee)
     return _pullAll(A, values, array.differenceBy, iteratee)
 end
 
 -------------------------------------------------------------------------------
+-- This method is like _.pullAll except that it accepts comparator which is
+-- invoked to compare elements of array to values. The comparator is invoked 
+-- with two arguments: (arrVal, othVal). 
+-- Note: Unlike _.differenceWith, this method mutates array.
 function array.pullAllWith(A, values, comparator)
     return _pullAll(A, values, array.differenceWith, comparator)
 end
 
 -------------------------------------------------------------------------------
+-- Removes elements from array corresponding to indexes and returns an array of
+-- removed elements. 
+-- Note: Unlike _.at, this method mutates array.
 function array.pullAt(A, indices)
     indices = array.keyBy(indices)
     local removed = {}
@@ -577,6 +606,9 @@ function array.pullAt(A, indices)
 end
 
 -------------------------------------------------------------------------------
+-- Removes all elements from array that predicate returns truthy for and 
+-- returns an array of the removed elements. The predicate is invoked with three
+-- arguments: (value, index, array). 
 function array.reduce(A, accumulator, predicate)
     for k,v in pairs(A) do
         accumulator = predicate(v, accumulator)
@@ -609,6 +641,8 @@ function array.remove(A, iteratee)
 end
 
 -------------------------------------------------------------------------------
+-- Reverses array so that the first element becomes the last, the second 
+-- element becomes the second to last, and so on. This method mutates the array
 function array.reverse(A)
     local length = #A
     local halfLength = math.floor(length/2)
@@ -645,18 +679,22 @@ function array.size(A)
 end
 
 -------------------------------------------------------------------------------
-function array.slice(A, count)
-    if not A then return A end
-    local output = {}
+-- Creates a slice of array from startIndex up to and including endIndex
+-- Note: Lodash, being javascript, slices from [start, end), but lua is 1-based
+-- so it is more logical and consistent to slice from [start, end]
+function array.slice(A, startIndex, endIndex)
+    local out = {}
+    if not A then return out end
 
-    count = modularCount(A,count)
-    
-    for i = 1, count do
-        if not A[i] then return output end
-        _insert(output, A[i])
+    local length = #A
+    startIndex = jo.clamp(_arrayPosition(startIndex, length), length)
+    endIndex = jo.clamp(_arrayPosition(endIndex, length), length)
+
+    for i = startIndex, endIndex do
+        _insert(out, A[i])
     end
 
-    return output
+    return out
 end
 
 -------------------------------------------------------------------------------
