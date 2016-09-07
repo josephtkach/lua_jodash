@@ -51,8 +51,9 @@ end
 function expectation:toBe(rhs)
     local result = self.obj == rhs
     if not result then 
-        print("Expected: " .. tostring(rhs))
-        print("Actual: " .. tostring(self.obj))
+        print(" ")
+        print(tostring("expected:").green .. tostring(rhs))
+        print(tostring("actual:").green .. tostring(self.obj))
     end
     return result
 end
@@ -229,9 +230,10 @@ function expectation:toMatchArray(rhs, comparator)
 
     local isEqual = deepEqual(self.obj, rhs, comparator, self.verbose)
     if not isEqual then
-        print("expected:")
+        print(" ")
+        print(tostring("expected:").green)
         tprint(rhs)
-        print("actual:")
+        print(tostring("actual:").green)
         tprint(self.obj)
     end
     return isEqual

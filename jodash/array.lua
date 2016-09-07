@@ -698,6 +698,62 @@ function array.slice(A, startIndex, endIndex)
 end
 
 -------------------------------------------------------------------------------
+local function _sortedIndex(A, value, iteratee)
+    iteratee = jo.iteratee(iteratee)
+    if not A then return -1 end
+
+    value = iteratee(value)
+    local distance = #A
+
+    if iteratee(A[1]) > value then return 0 end
+    if iteratee(A[distance]) < value then return distance+1 end
+
+    local index = distance
+    local lastIndex = 0
+    local sanity = 40 -- I mean, sweet jesus
+
+    while index ~= lastIndex do
+        distance = math.floor(distance/2)
+        if distance < 1 then distance = 1 end
+        lastIndex = index
+
+        local prevIndex = index - 1
+        if prevIndex < 1 then prevIndex = 1 end
+
+        local left = iteratee(A[prevIndex])
+        local right = iteratee(A[index])
+
+        local down = (value <= right and -distance) or 0
+        local up = (value > left and distance) or 0
+      
+        index = index + up + down
+
+        sanity = sanity - 1
+        if sanity == 0 then return end
+    end
+    return index
+end
+
+-------------------------------------------------------------------------------
+-- Uses a binary search to determine the lowest index at which value should be
+-- inserted into array in order to maintain its sort order.
+function array.sortedIndex(A, value)
+    return _sortedIndex(A, value)
+end
+
+-------------------------------------------------------------------------------
+-- sortedIndex but with iteratee
+function array.sortedIndexBy(A, value, iteratee)
+    return _sortedIndex(A, value, iteratee)
+end
+
+-------------------------------------------------------------------------------
+-- sortedIndex but with iteratee
+function array.sortedIndexOf(A, value)
+   
+end
+
+-------------------------------------------------------------------------------
 -- mine
 function array.splat(count, value)
     local A = {}
