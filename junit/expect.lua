@@ -4,10 +4,6 @@
 --  *   avoid dependency
 --  *   redundancy creates safety when unit testing
 -------------------------------------------------------------------------------
--- compatibility
-local unpack = unpack or table.unpack
-
--------------------------------------------------------------------------------
 local expectation = {}
 expectation.__index = function(self, key)
     local v = rawget(expectation, key)
