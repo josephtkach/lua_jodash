@@ -748,9 +748,59 @@ function array.sortedIndexBy(A, value, iteratee)
 end
 
 -------------------------------------------------------------------------------
--- sortedIndex but with iteratee
+-- helpers for sortedIndexOf
+local function _firstIndexOf(A, mid, value, iteratee)
+    local index = mid - 1
+    while value == iteratee( A[index] ) do
+        index = index - 1
+    end
+    return index + 1
+end
+
+local function _lastIndexOf(A, mid, value, iteratee)
+     local index = mid + 1
+    while value == iteratee( A[index] ) do
+        index = index + 1
+    end
+    return index - 1
+end
+
+-------------------------------------------------------------------------------
+-- I borrowed this implementation from the internet, there was no license 
+-- associated with it, but it was labelled CHILLCODE(tm). I refactored it to 
+-- fit the style of the library
+local function _sortedIndexOf(A, value, resolver, iteratee)
+    if not A then return -1 end
+    iteratee = jo.iteratee(iteratee)
+
+    local first, last, mid = 1, #A, 0
+    while first <= last do
+        mid = math.floor( (first+last)/2 )
+        local candidate = iteratee( A[mid] )
+
+        if value == candidate then
+            return resolver(A, mid, value, iteratee)
+        elseif value < candidate then
+            last = mid - 1
+        else
+            first = mid + 1
+        end
+    end
+    return -1
+end
+
+-------------------------------------------------------------------------------
+-- This method is like _.indexOf except that it performs a binary search on a
+-- sorted array.
 function array.sortedIndexOf(A, value)
-   
+    return _sortedIndexOf(A, value, _firstIndexOf)
+end
+
+-------------------------------------------------------------------------------
+-- This method is like _.lastIndexOf except that it performs a binary search on
+-- a sorted array.
+function array.sortedLastIndexOf(A, value)
+    return _sortedIndexOf(A, value, _lastIndexOf)
 end
 
 -------------------------------------------------------------------------------
