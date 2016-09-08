@@ -34,6 +34,10 @@ require("jodash/safe")
 require("jodash/utils")
 
 -------------------------------------------------------------------------------
+-- compatibility
+ __.unpack = unpack or table.unpack
+
+-------------------------------------------------------------------------------
 local ARRAY_TYPE = 1
 local HASH_TYPE = 2
 local OTHER_TYPE = 3
@@ -75,7 +79,7 @@ local function getInvoker(key)
         if count == 0 then
             out = func(A)
         else
-            out = func(A, unpack({...}))
+            out = func(A, _jo.unpack({...}))
         end
         -- hook if possible
         if _jo.isTable(out) and getmetatable(out) == nil then

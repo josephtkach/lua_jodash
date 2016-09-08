@@ -129,13 +129,15 @@ end
 -------------------------------------------------------------------------------
 -- compatibility
 local gfind = string.gfind
+local strfind = string.find
+local strsub = string.find
 if _VERSION == "Lua 5.2" then gfind = string.gmatch end
--------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------
 function jo.strSplit(str, delim, maxNb)
     if delim == '.' then delim = '%.' end
     -- Eliminate bad cases...
-    if string.find(str, delim) == nil then
+    if strfind(str, delim) == nil then
         return { str }
     end
     if maxNb == nil or maxNb < 1 then
@@ -153,7 +155,7 @@ function jo.strSplit(str, delim, maxNb)
     end
     -- Handle the last field
     if nb ~= maxNb then
-        result[nb + 1] = string.sub(str, lastPos)
+        result[nb + 1] = strsub(str, lastPos)
     end
     return result
 end
@@ -170,10 +172,11 @@ function jo.swap(A,B)
 end
 
 -------------------------------------------------------------------------------
+local _insert = table.insert -- optimization
 function jo.toArray(A)
     local output = set.new()
     for k,v in pairs(A) do
-        table.insert(output, v)
+        _insert(output, v)
     end
     return output
 end

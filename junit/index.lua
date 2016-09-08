@@ -5,6 +5,10 @@ local exports = {}
 exports.__index = exports
 
 -------------------------------------------------------------------------------
+-- compatibility
+unpack = unpack or table.unpack
+
+-------------------------------------------------------------------------------
 require("junit/jstring")
 require("junit/print")
 require("junit/utils")
