@@ -794,6 +794,18 @@ function array.sortedLastIndexOf(A, value)
 end
 
 -------------------------------------------------------------------------------
+-- we do not support this because my implementation of uniq makes it unecessary
+function array.sortedUniq()
+    assert(false, "just use uniq")
+end
+
+-------------------------------------------------------------------------------
+-- we do not support this because my implementation of uniq makes it unecessary
+function array.sortedUniqBy()
+    assert(false, "just use uniqBy")
+end
+
+-------------------------------------------------------------------------------
 -- mine
 function array.splat(count, value)
     local A = {}
