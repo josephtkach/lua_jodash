@@ -823,6 +823,12 @@ function array.tail(A)
 end
 
 -------------------------------------------------------------------------------
+-- Creates a slice of array with n elements taken from the beginning.
+function array.take(A, n)
+    return array.slice(A, 1, n)
+end
+
+-------------------------------------------------------------------------------
 function array.union(A, B)
     local output = {}
 
