@@ -687,6 +687,7 @@ function array.slice(A, startIndex, endIndex)
     if not A then return out end
 
     local length = #A
+    endIndex = endIndex or length
     startIndex = jo.clamp(_arrayPosition(startIndex, length), length)
     endIndex = jo.clamp(_arrayPosition(endIndex, length), length)
 
@@ -813,6 +814,12 @@ function array.splat(count, value)
         _insert(A, value)
     end
     return A
+end
+
+-------------------------------------------------------------------------------
+-- Gets all but the first element of array.
+function array.tail(A)
+    return array.slice(A, 2)
 end
 
 -------------------------------------------------------------------------------
