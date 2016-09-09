@@ -781,7 +781,6 @@ end
 -- This method is like _.sortedLastIndex except that it accepts iteratee which
 -- is invoked for value and each element of array to compute their sort ranking.
 -- The iteratee is invoked with one argument: (value).
-
 function array.sortedLastIndexBy(A, value, iteratee)
    local found, index = _sortedIndexOf(A, value, _lastIndex, iteratee)
     return (found ~= -1 and found) or index

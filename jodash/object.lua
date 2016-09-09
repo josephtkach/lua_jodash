@@ -7,7 +7,7 @@ function jo.get(object, path, default, verbose)
     path = tostring(path)
     local paths = jo.strSplit(path, '.')
     for i,v in ipairs(paths) do
-        if not type(object) == "table" then 
+        if not (type(object) == "table") then 
             return default 
         end
         object = object[v]

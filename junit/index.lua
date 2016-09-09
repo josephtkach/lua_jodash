@@ -203,7 +203,16 @@ function exports:new(params)
 
     outmt.__newindex = function(self, key, value)
         if type(value) == "function" then
-            table.insert(self.orderedTests, { name = key, func = value })
+            local foundIndex = nil
+            for i, v in ipairs(self.orderedTests) do
+                if v.name == key then foundIndex = i; break end
+            end
+
+            if foundIndex then
+                self.orderedTests[foundIndex].func = value
+            else
+                table.insert(self.orderedTests, { name = key, func = value })
+            end
         else
             rawset(self, key, value)
         end
