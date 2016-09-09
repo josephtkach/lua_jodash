@@ -698,56 +698,6 @@ function array.slice(A, startIndex, endIndex)
 end
 
 -------------------------------------------------------------------------------
-local function _sortedIndex(A, value, iteratee)
-    iteratee = jo.iteratee(iteratee)
-    if not A then return -1 end
-
-    value = iteratee(value)
-    local distance = #A
-
-    if iteratee(A[1]) > value then return 0 end
-    if iteratee(A[distance]) < value then return distance+1 end
-
-    local index = distance
-    local lastIndex = 0
-    local sanity = 40 -- I mean, sweet jesus
-
-    while index ~= lastIndex do
-        distance = math.floor(distance/2)
-        if distance < 1 then distance = 1 end
-        lastIndex = index
-
-        local prevIndex = index - 1
-        if prevIndex < 1 then prevIndex = 1 end
-
-        local left = iteratee(A[prevIndex])
-        local right = iteratee(A[index])
-
-        local down = (value <= right and -distance) or 0
-        local up = (value > left and distance) or 0
-      
-        index = index + up + down
-
-        sanity = sanity - 1
-        if sanity == 0 then return end
-    end
-    return index
-end
-
--------------------------------------------------------------------------------
--- Uses a binary search to determine the lowest index at which value should be
--- inserted into array in order to maintain its sort order.
-function array.sortedIndex(A, value)
-    return _sortedIndex(A, value)
-end
-
--------------------------------------------------------------------------------
--- sortedIndex but with iteratee
-function array.sortedIndexBy(A, value, iteratee)
-    return _sortedIndex(A, value, iteratee)
-end
-
--------------------------------------------------------------------------------
 -- helpers for sortedIndexOf
 local function _firstIndexOf(A, mid, value, iteratee)
     local index = mid - 1
@@ -758,11 +708,15 @@ local function _firstIndexOf(A, mid, value, iteratee)
 end
 
 local function _lastIndexOf(A, mid, value, iteratee)
-     local index = mid + 1
+    local index = mid + 1
     while value == iteratee( A[index] ) do
         index = index + 1
     end
     return index - 1
+end
+
+local function _lastIndex(A, mid, value, iteratee)
+    return _lastIndexOf(A, mid, value, iteratee) + 1
 end
 
 -------------------------------------------------------------------------------
@@ -770,8 +724,12 @@ end
 -- associated with it, but it was labelled CHILLCODE(tm). I refactored it to 
 -- fit the style of the library
 local function _sortedIndexOf(A, value, resolver, iteratee)
-    if not A then return -1 end
+    if not A then return -1, -1 end
     iteratee = jo.iteratee(iteratee)
+
+    local value = iteratee(value)
+    local firstValue = iteratee( A[1] )
+    if firstValue and value < firstValue then return 0 end
 
     local first, last, mid = 1, #A, 0
     while first <= last do
@@ -786,7 +744,22 @@ local function _sortedIndexOf(A, value, resolver, iteratee)
             first = mid + 1
         end
     end
-    return -1
+    return -1, first
+end
+
+-------------------------------------------------------------------------------
+-- Uses a binary search to determine the lowest index at which value should be
+-- inserted into array in order to maintain its sort order.
+function array.sortedIndex(A, value)
+    local found, index = _sortedIndexOf(A, value, _firstIndexOf)
+    return (found ~= -1 and found) or index
+end
+
+-------------------------------------------------------------------------------
+-- sortedIndex but with iteratee
+function array.sortedIndexBy(A, value, iteratee)
+    local found, index = _sortedIndexOf(A, value, _firstIndexOf, iteratee)
+    return (found ~= -1 and found) or index
 end
 
 -------------------------------------------------------------------------------
@@ -794,6 +767,24 @@ end
 -- sorted array.
 function array.sortedIndexOf(A, value)
     return _sortedIndexOf(A, value, _firstIndexOf)
+end
+
+-------------------------------------------------------------------------------
+-- This method is like _.sortedIndex except that it returns the highest index 
+-- at which value should be inserted into array in order to maintain its sort order.
+function array.sortedLastIndex(A, value)
+    local found, index = _sortedIndexOf(A, value, _lastIndex)
+    return (found ~= -1 and found) or index
+end
+
+-------------------------------------------------------------------------------
+-- This method is like _.sortedLastIndex except that it accepts iteratee which
+-- is invoked for value and each element of array to compute their sort ranking.
+-- The iteratee is invoked with one argument: (value).
+
+function array.sortedLastIndexBy(A, value, iteratee)
+   local found, index = _sortedIndexOf(A, value, _lastIndex, iteratee)
+    return (found ~= -1 and found) or index
 end
 
 -------------------------------------------------------------------------------
