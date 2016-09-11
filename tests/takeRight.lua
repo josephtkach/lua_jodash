@@ -1,9 +1,14 @@
 -------------------------------------------------------------------------------
-local test = junit:new({ name = "Array:Take" })
+local test = junit:new({ name = "Array:TakeRight" })
 
 -------------------------------------------------------------------------------
 function test.Default(data, userData)
-    expect( jo.take(data.ten, 3) ):toMatchArray( {1,2,3} )
+    expect( jo.takeRight(data.ten, 3) ):toMatchArray( {8,9,10} )
+end
+
+-------------------------------------------------------------------------------
+function test.TooManyCooks(data, userData)
+    expect( jo.takeRight({1,2,3}, 7) ):toMatchArray( {1,2,3} )
 end
 
 -------------------------------------------------------------------------------

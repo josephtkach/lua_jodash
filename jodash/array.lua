@@ -829,6 +829,14 @@ function array.take(A, n)
 end
 
 -------------------------------------------------------------------------------
+-- Creates a slice of array with n elements taken from the beginning.
+function array.takeRight(A, n)
+    local length = #A
+    local start = 1 + length - jo.clamp(n, length)
+    return array.slice(A, start, #A)
+end
+
+-------------------------------------------------------------------------------
 function array.union(A, B)
     local output = {}
 
