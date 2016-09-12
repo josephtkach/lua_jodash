@@ -1,3 +1,5 @@
+lastFailure flag
+
 seriously tho: prettify output on unit tests
 convention: predicates should be arged like function(x,k)
 

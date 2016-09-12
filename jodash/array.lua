@@ -127,73 +127,46 @@ end
 
 -------------------------------------------------------------------------------
 function array.drop(A, count)
-    local out = {}
-    for i = 1 + (count or 1), #A do
-        _insert(out, A[i])
-    end
-    return out
+    return array.slice(A, 1 + (count or 1))
 end
 
 -------------------------------------------------------------------------------
 function array.dropRight(A, count)
-    local out = {}
-    count = #A - (count or 1)
-    for i = 1, count do
-        _insert(out, A[i])
-    end
-    return out
+    local length = #A
+    local endIndex = jo.clamp(length - (count or 1), 0, length)
+    return array.slice(A, 1, endIndex)
 end
 
 -------------------------------------------------------------------------------
-function array.dropRightWhile(A, predicate)
-    predicate = jo.iteratee(predicate)
-    
-    local out = {}
-    -- the name "count" as opposed to "length" implies something
-    -- pre- rather than descriptive, and as we are attempting to 
-    -- prescribe a property of the right end of the array, (the 
-    -- "length") count feels better than "length". See dropWhile
-    count = 0
-
-    local function backwards()
-        for i = #A,1,-1 do
-            count = i
-            if jo.isFalsey(predicate(A[i], i, A)) then return end
-        end
+local function _fromTheBack(A, iteratee)
+    iteratee = jo.iteratee(iteratee)
+    local length = #A
+    local stoppedAt = length
+    for i = length,1,-1 do
+        stoppedAt = i
+        if jo.isFalsey(iteratee(A[i], i, A)) then break end
     end
+    return stoppedAt
+end
 
-    backwards()
-
-    for i = 1, count do
-        _insert(out, A[i])
-    end
-
-    return out
+-------------------------------------------------------------------------------
+function array.dropRightWhile(A, iteratee)
+    local newLength = _fromTheBack(A, iteratee)
+    return array.slice(A, 1, newLength)
 end
 
 -------------------------------------------------------------------------------
 function array.dropWhile(A, predicate)
     predicate = jo.iteratee(predicate)
     
-    local out = {}
     local i = 1
     local length = #A
-    -- length feels more descriptive than proscriptive, and as the length
-    -- of the array is changing only artifactually as a result of changing
-    -- the "start" of the array, we used it instead of "count"
-    -- hence there is a jarring asymmetry between the nomenclature of
-    -- dropWhile and dropRightWhile
 
     while i < length and not jo.isFalsey(predicate(A[i], i, A)) do
         i = i + 1
     end
 
-    while i <= length do
-        _insert(out, A[i])
-        i = i + 1
-    end
-
-    return out
+    return array.slice(A, i, length)
 end
 
 -------------------------------------------------------------------------------
@@ -688,7 +661,7 @@ function array.slice(A, startIndex, endIndex)
 
     local length = #A
     endIndex = endIndex or length
-    startIndex = jo.clamp(_arrayPosition(startIndex, length), length)
+    startIndex = jo.clamp(_arrayPosition(startIndex, length), length + 1)
     endIndex = jo.clamp(_arrayPosition(endIndex, length), length)
 
     for i = startIndex, endIndex do
@@ -835,6 +808,16 @@ function array.takeRight(A, n)
     local start = 1 + length - jo.clamp(n, length)
     return array.slice(A, start, #A)
 end
+
+-------------------------------------------------------------------------------
+-- Creates a slice of array with elements taken from the end. Elements are
+-- taken until predicate returns falsey. The predicate is invoked with three
+-- arguments: (value, index, array).
+function array.takeRightWhile(A, predicate)
+    local start = _fromTheBack(A, predicate) + 1
+    return array.slice(A, start)
+end
+
 
 -------------------------------------------------------------------------------
 function array.union(A, B)
