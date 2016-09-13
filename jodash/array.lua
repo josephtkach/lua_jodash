@@ -138,6 +138,17 @@ function array.dropRight(A, count)
 end
 
 -------------------------------------------------------------------------------
+local function _fromTheFront(A, iteratee)
+    iteratee = jo.iteratee(iteratee)
+    local i, length = 1, #A
+
+    while i < length and not jo.isFalsey(iteratee(A[i], i, A)) do
+        i = i + 1
+    end
+    return i - 1
+end
+
+-------------------------------------------------------------------------------
 local function _fromTheBack(A, iteratee)
     iteratee = jo.iteratee(iteratee)
     local length = #A
@@ -156,17 +167,9 @@ function array.dropRightWhile(A, iteratee)
 end
 
 -------------------------------------------------------------------------------
-function array.dropWhile(A, predicate)
-    predicate = jo.iteratee(predicate)
-    
-    local i = 1
-    local length = #A
-
-    while i < length and not jo.isFalsey(predicate(A[i], i, A)) do
-        i = i + 1
-    end
-
-    return array.slice(A, i, length)
+function array.dropWhile(A, iteratee)
+    local start = _fromTheFront(A, iteratee) + 1
+    return array.slice(A, start)
 end
 
 -------------------------------------------------------------------------------
@@ -818,6 +821,14 @@ function array.takeRightWhile(A, predicate)
     return array.slice(A, start)
 end
 
+-------------------------------------------------------------------------------
+--Creates a slice of array with elements taken from the beginning. Elements are
+-- taken until predicate returns falsey. The predicate is invoked with three 
+-- arguments: (value, index, array).
+function array.takeWhile(A, iteratee)
+    local newLength = _fromTheFront(A, iteratee)
+    return array.slice(A, 1, newLength)
+end
 
 -------------------------------------------------------------------------------
 function array.union(A, B)

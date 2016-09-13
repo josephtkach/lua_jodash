@@ -7,6 +7,14 @@ local commandLine = {}
 local lookup = {}
 
 -------------------------------------------------------------------------------
+local shorthands = {
+    a = "all",
+    v = "verbose",
+    c = "clear",
+    H = "help",
+}
+
+-------------------------------------------------------------------------------
 local function flag(name)
     lookup[name] = function(junit, subParams)
         junit[name] = true
@@ -70,7 +78,7 @@ local function processArg(junit, v)
         subParams = tokenized[2]
     end
 
-    local processor = lookup[argName]
+    local processor = lookup[argName] or lookup[ shorthands[argName] ]
     if processor then
         processor(junit, subParams)
     end

@@ -3,6 +3,7 @@ local test = junit:new({ name = "Array:DropWhile" })
 
 local users = {
   { user = "barney",  active = false  },
+  { user = "barney",  active = false  },
   { user = "fred",    active = false },
   { user = "pebbles", active = true },
 }
