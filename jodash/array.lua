@@ -869,10 +869,33 @@ function array.unionBy(...)
 end
 
 -------------------------------------------------------------------------------
--- lodash is so cool, sleek, and edgy for spelling `unique` without the ue.
--- IT'S SO HIP IT'S THE NUMBER ONE MOST DEMANDED OBJECT IN AN OLD FOLKS' HOME.
--- I absolutely refuse to call it this. It's stupid and self-important, just
--- like this comment.
+-- This method is like _.union except that it accepts comparator which is 
+-- invoked to compare elements of arrays. Result values are chosen from the 
+-- first array in which the value occurs. The comparator is invoked with two 
+-- arguments: (arrVal, othVal).
+function array.unionWith(...)
+    local out = {}
+    local args = {...}
+    local comparator = jo.private.pullLastIfFunction(args) 
+    comparator = comparator or jo.sameValue
+
+    local _append = function(x)
+        for i = 1, #out do
+            if comparator(x, out[i]) then return end
+        end
+        _insert(out, x)
+    end
+
+    array.forEach(args, function(arg)
+        array.forEach(arg, _append)
+    end)
+
+    return out
+end
+
+-------------------------------------------------------------------------------
+-- calling this series of functions "uniq" instead of "unique" is bullshit, and
+-- and I won't do it
 function array.unique( A )
     local A_has = array.keyBy(A, jo.identity)
     return array.keys(A_has)
