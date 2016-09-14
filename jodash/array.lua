@@ -46,7 +46,7 @@ end
 -- Creates a new array concatenating array with any additional arrays and/or values. 
 function array.concat(...)
     local out = {}
-    local _append = function(x) table.insert(out, x) end
+    local _append = function(x) _insert(out, x) end
 
     array.forEach({...}, function(arg)
         if jo.isTable(arg) then
@@ -772,14 +772,14 @@ end
 
 -------------------------------------------------------------------------------
 -- we do not support this because my implementation of uniq makes it unecessary
-function array.sortedUniq()
-    assert(false, "just use uniq")
+function array.sortedUnique()
+    assert(false, "just use unique")
 end
 
 -------------------------------------------------------------------------------
 -- we do not support this because my implementation of uniq makes it unecessary
-function array.sortedUniqBy()
-    assert(false, "just use uniqBy")
+function array.sortedUniqueBy()
+    assert(false, "just use uniqueBy")
 end
 
 -------------------------------------------------------------------------------
@@ -831,16 +831,49 @@ function array.takeWhile(A, iteratee)
 end
 
 -------------------------------------------------------------------------------
-function array.union(A, B)
-    local output = {}
+-- helper for union
+local function _union(iteratee, args)
+    local out = {}
+    local test = {}
 
-    jo.concat(output, A)
-    jo.concat(output, B)
-    return output
+    local _append = function(x)
+        local iterateed = iteratee(x)
+        if not test[iterateed] then
+            _insert(out, x)
+            test[iterateed] = true
+        end
+    end
+
+    array.forEach(args, function(arg)
+        array.forEach(arg, _append)
+    end)
+
+    return out
 end
 
 -------------------------------------------------------------------------------
-function array.uniq( A )
+-- Creates an array of unique values, in order, from all given arrays
+function array.union(...)
+    return _union(jo.identity, {...})
+end
+
+-------------------------------------------------------------------------------
+-- This method is like _.union except that it accepts iteratee which is invoked
+-- for each element of each arrays to generate the criterion by which 
+-- uniqueness is computed. Result values are chosen from the first array in 
+-- which the value occurs. The iteratee is invoked with one argument: (value).
+function array.unionBy(...)
+    local args = {...}
+    local last = jo.private.pullLastIfNotTable(args)
+    return _union(jo.iteratee(last), args)
+end
+
+-------------------------------------------------------------------------------
+-- lodash is so cool, sleek, and edgy for spelling `unique` without the ue.
+-- IT'S SO HIP IT'S THE NUMBER ONE MOST DEMANDED OBJECT IN AN OLD FOLKS' HOME.
+-- I absolutely refuse to call it this. It's stupid and self-important, just
+-- like this comment.
+function array.unique( A )
     local A_has = array.keyBy(A, jo.identity)
     return array.keys(A_has)
 end
