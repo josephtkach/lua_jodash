@@ -837,10 +837,10 @@ local function _union(iteratee, args)
     local test = {}
 
     local _append = function(x)
-        local iterateed = iteratee(x)
-        if not test[iterateed] then
+        local computed = iteratee(x)
+        if not test[computed] then
             _insert(out, x)
-            test[iterateed] = true
+            test[computed] = true
         end
     end
 
@@ -895,11 +895,49 @@ end
 
 -------------------------------------------------------------------------------
 -- calling this series of functions "uniq" instead of "unique" is bullshit, and
--- and I won't do it
-function array.unique( A )
-    local A_has = array.keyBy(A, jo.identity)
-    return array.keys(A_has)
+-- and I won't do it, and as I specify in the license, we are using a fully
+-- open source license with the one exception that you are NOT allowed to call
+-- this uniq
+
+-------------------------------------------------------------------------------
+-- helper for `unique` and `uniqueBy`
+local function _unique(A, iteratee)
+    iteratee = jo.iteratee(iteratee)
+
+    local out = {}
+    local A_has = array.keyBy(A, iteratee)
+
+    array.forEach(A, function(x)
+        local computed = iteratee(x)
+        if A_has[computed] then
+            _insert(out, x)
+            A_has[computed] = nil
+        end
+    end)
+
+    return out
 end
+
+-------------------------------------------------------------------------------
+-- Creates a duplicate-free version of an array, in which only the first 
+-- occurrence of each element is kept.
+function array.unique(A)
+   return _unique(A)
+end
+
+-------------------------------------------------------------------------------
+-- This method is like _.unique except that it accepts iteratee which is 
+-- invoked for each element in array to generate the criterion by which 
+-- uniqueness is computed. The iteratee is invoked with one argument: (value).
+function array.uniqueBy(A, iteratee)
+   return _unique(A, iteratee)
+end
+
+-------------------------------------------------------------------------------
+function array.uniqueWith(A, comparator)
+    assert(false, "not implemented yet")
+end
+
 
 -------------------------------------------------------------------------------
 return array

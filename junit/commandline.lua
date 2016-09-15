@@ -11,7 +11,8 @@ local shorthands = {
     a = "all",
     v = "verbose",
     c = "clear",
-    H = "help",
+    h = "help",
+    o = "only",
 }
 
 -------------------------------------------------------------------------------
@@ -23,8 +24,7 @@ end
 
 -------------------------------------------------------------------------------
 local title = function(s) print(string.rep(" ", 4) .. green(s)) end
-local body = function(s) print( string.wrap(s, 80, 8 ) ) end
-
+local body = function(s) print( string.wrap(s, 80, 8 ) .. '\n' ) end
 -------------------------------------------------------------------------------
 lookup.help = function(junit, subParams)
     junit.hr()
@@ -37,7 +37,10 @@ lookup.help = function(junit, subParams)
     
     title("help")
     body("Show this message")
-    
+
+    title("only")
+    body("run just the specified test. specified as `subsection.methodName.TestName`")
+
     title("verbose")
     body("Show verbose output")
     print(" ")
