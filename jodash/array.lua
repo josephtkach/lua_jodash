@@ -926,7 +926,7 @@ function array.unique(A)
 end
 
 -------------------------------------------------------------------------------
--- This method is like _.unique except that it accepts iteratee which is 
+-- This method is like `unique` except that it accepts iteratee which is 
 -- invoked for each element in array to generate the criterion by which 
 -- uniqueness is computed. The iteratee is invoked with one argument: (value).
 function array.uniqueBy(A, iteratee)
@@ -934,10 +934,20 @@ function array.uniqueBy(A, iteratee)
 end
 
 -------------------------------------------------------------------------------
+-- This method is like `unique` except that it accepts comparator which is 
+-- invoked to compare elements of array. The comparator is invoked with two 
+-- arguments: (arrVal, othVal).
 function array.uniqueWith(A, comparator)
-    assert(false, "not implemented yet")
-end
+    comparator = comparator or jo.sameValue
+    local out = {}
 
+    array.forEach(A, function(x)
+        if _compareEachWith(x, out, comparator) then return end
+        _insert(out, x)
+    end)
+
+    return out
+end
 
 -------------------------------------------------------------------------------
 return array
