@@ -83,6 +83,8 @@ function jo.isFalsey(A)
         or A == false
         or A == ""
         or A == 0
+        or A == jo.UNDEFINED
+        or A == jo.safe()
         --or isNan(A) -- todo: bind a C++ NaN check
 end
 
@@ -180,3 +182,10 @@ function jo.toArray(A)
     end
     return output
 end
+
+-------------------------------------------------------------------------------
+function jo.UNDEFINED()
+    return jo.UNDEFINED
+end
+
+

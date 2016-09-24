@@ -16,7 +16,7 @@ end
 
 -------------------------------------------------------------------------------
 function test.Empty(data, userData)
-    expect( data.empty ):toMatchArray( data.empty )
+    expect( userData.func(data.empty) ):toMatchArray( data.empty )
 end
 
 -------------------------------------------------------------------------------

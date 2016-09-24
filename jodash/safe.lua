@@ -15,7 +15,7 @@ local function stringNoop(lhs, rhs)
 end
 
 -------------------------------------------------------------------------------
-local faultTolerantObject = {}
+faultTolerantObject = {}
 setmetatable(faultTolerantObject, {
     __call = function() return faultTolerantObject end,
     __add = mathNoop,

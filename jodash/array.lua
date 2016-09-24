@@ -950,4 +950,40 @@ function array.uniqueWith(A, comparator)
 end
 
 -------------------------------------------------------------------------------
+-- This method is like `zip` except that it accepts an array of grouped 
+-- elements and creates an array regrouping the elements to their pre-zip 
+-- configuration.
+function array.unzip(A)
+    local out = {}
+    assert(false, "not implemented yet")
+    return out
+end
+
+-------------------------------------------------------------------------------
+-- we are using a sentinel value of jo.UNDEFINED for tuples with holes in them
+function array.zip(A)
+    local out = {}
+    local first = array.first(A)
+    local numTuples = #first
+    local inputLength = #A
+
+    for y = 1, numTuples do 
+        local row = {}
+        out[y] = row
+
+        for x = 1, inputLength do
+            local column = A[x]
+            local val = column[y]
+            if val ~= nil then 
+                row[x] = column[y]
+            else 
+                row[x] = jo.UNDEFINED
+            end
+        end
+    end
+
+    return out
+end
+
+-------------------------------------------------------------------------------
 return array
