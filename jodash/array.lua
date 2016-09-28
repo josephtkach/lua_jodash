@@ -950,18 +950,9 @@ function array.uniqueWith(A, comparator)
 end
 
 -------------------------------------------------------------------------------
--- This method is like `zip` except that it accepts an array of grouped 
--- elements and creates an array regrouping the elements to their pre-zip 
--- configuration.
-function array.unzip(A)
-    local out = {}
-    assert(false, "not implemented yet")
-    return out
-end
-
--------------------------------------------------------------------------------
+-- not sure why zip and unzip are separate. zip(zip(A)) = A
 -- we are using a sentinel value of jo.UNDEFINED for tuples with holes in them
-function array.zip(A)
+local function _zip(A)
     local out = {}
     local first = array.first(A)
     local numTuples = #first
@@ -983,6 +974,26 @@ function array.zip(A)
     end
 
     return out
+end
+
+-------------------------------------------------------------------------------
+-- This method is like `zip` except that it accepts an array of grouped 
+-- elements and creates an array regrouping the elements to their pre-zip 
+-- configuration.
+--[[
+var zipped = _.zip(['a', 'b'], [1, 2], [true, false]);
+// => [['a', 1, true], ['b', 2, false]
+ 
+_.unzip(zipped);
+// => [['a', 'b'], [1, 2], [true, false]
+--]]
+function array.unzip(A)
+   return _zip(A)
+end
+
+-------------------------------------------------------------------------------
+function array.zip(A)
+   return _zip(A)
 end
 
 -------------------------------------------------------------------------------
