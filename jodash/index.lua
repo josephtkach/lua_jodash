@@ -44,11 +44,11 @@ local OTHER_TYPE = 3
 
 local retriever = {}
 retriever[ARRAY_TYPE] = function(key, A) 
-    return _jo.array[key] or rawget(jo, key) or rawget(A, key)
+    return _jo.array[key] or rawget(_jo, key) or rawget(A, key)
 end
 
 retriever[HASH_TYPE] = function(key, A)
-    return _jo.hash[key] or rawget(jo, key) or rawget(A, key)
+    return _jo.hash[key] or rawget(_jo, key) or rawget(A, key)
 end
 
 retriever[OTHER_TYPE] = function(key, A)
@@ -72,7 +72,7 @@ local function getInvoker(key)
         -- don't allow access to internal data
         if not _jo.isFunction(func) then 
             assert(false, "Invalid key: " .. tostring(key))
-            return nil 
+            return nil
         end
 
         local count = select("#", ...)

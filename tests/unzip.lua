@@ -7,8 +7,6 @@ local test = junit:new({
 })
 
 -------------------------------------------------------------------------------
--- _.zip(['a', 'b'], [1, 2], [true, false]);
--- => [['a', 1, true], ['b', 2, false]] 
 function test.Zip(data, userData)
     local input = { {'a','b'}, {1,2}, {true,false} }
 
@@ -38,7 +36,7 @@ function test.Empty(data, userData)
 end
 
 -------------------------------------------------------------------------------
-function test.oneByOne(data, userData)
+function test.OneByOne(data, userData)
     local input = { {'a'}, }
 
     expect( userData.func(input) )

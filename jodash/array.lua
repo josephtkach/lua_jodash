@@ -952,7 +952,8 @@ end
 -------------------------------------------------------------------------------
 -- not sure why zip and unzip are separate. zip(zip(A)) = A
 -- we are using a sentinel value of jo.UNDEFINED for tuples with holes in them
-local function _zip(A)
+local function _zip(A, iteratee)
+    iteratee = jo.iteratee(iteratee)
     local out = {}
     local first = array.first(A)
     local numTuples = #first
@@ -960,7 +961,6 @@ local function _zip(A)
 
     for y = 1, numTuples do 
         local row = {}
-        out[y] = row
 
         for x = 1, inputLength do
             local column = A[x]
@@ -971,6 +971,8 @@ local function _zip(A)
                 row[x] = jo.UNDEFINED
             end
         end
+
+        out[y] = iteratee(row)
     end
 
     return out
@@ -980,20 +982,26 @@ end
 -- This method is like `zip` except that it accepts an array of grouped 
 -- elements and creates an array regrouping the elements to their pre-zip 
 -- configuration.
---[[
-var zipped = _.zip(['a', 'b'], [1, 2], [true, false]);
-// => [['a', 1, true], ['b', 2, false]
- 
-_.unzip(zipped);
-// => [['a', 'b'], [1, 2], [true, false]
---]]
 function array.unzip(A)
    return _zip(A)
 end
 
 -------------------------------------------------------------------------------
+-- This method is like _.unzip except that it accepts iteratee to specify how
+-- regrouped values should be combined. The iteratee is invoked with the 
+-- elements of each group.
+function array.unzipWith(A, iteratee)
+   return _zip(A, iteratee)
+end
+
+-------------------------------------------------------------------------------
 function array.zip(A)
    return _zip(A)
+end
+
+-------------------------------------------------------------------------------
+function array.zipWith(A, iteratee)
+   return _zip(A, iteratee)
 end
 
 -------------------------------------------------------------------------------
