@@ -48,13 +48,13 @@ function array.concat(...)
     local out = {}
     local _append = function(x) _insert(out, x) end
 
-    array.forEach({...}, function(arg)
+    for i,arg in ipairs({...}) do
         if jo.isTable(arg) then
             array.forEach(arg, _append)
         else
             _insert(out, arg)
         end
-    end)
+    end
 
     return out
 end
@@ -69,15 +69,15 @@ local function _difference(A, iteratee, args)
         test[ iteratee(x) ] = true
     end
 
-    array.forEach(args, function(arg)
-        jo._.forEach(arg, _assign)
-    end)
+    for i,arg in ipairs(args) do
+        array.forEach(arg, _assign)
+    end
 
-    array.forEach(A, function(x)
-        if test[iteratee(x)] == nil then
-            _insert(out, x)
+    for i,v in ipairs(A) do
+        if test[iteratee(v)] == nil then
+            _insert(out, v)
         end 
-    end)
+    end
 
     return out
 end
@@ -995,11 +995,25 @@ function array.unzipWith(A, iteratee)
 end
 
 -------------------------------------------------------------------------------
+-- Creates an array excluding all given values.
+-- Note: Unlike `pull`, this method returns a new array.
+function array.without(A, ...)
+    return array.difference(A, ...)
+end
+
+-------------------------------------------------------------------------------
+-- Creates an array of grouped elements, the first of which contains the first
+-- elements of the given arrays, the second of which contains the second
+-- elements of the given arrays, and so on.
+-- not functionally different from unzip in my implementation
 function array.zip(A)
    return _zip(A)
 end
 
 -------------------------------------------------------------------------------
+-- This method is like _.zip except that it accepts iteratee to specify how 
+-- grouped values should be combined. The iteratee is invoked with the elements
+-- of each group: (...group).
 function array.zipWith(A, iteratee)
    return _zip(A, iteratee)
 end

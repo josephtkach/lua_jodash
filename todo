@@ -22,3 +22,6 @@ instrumentation for debugging
 
 better object level management of unit test harness state
 better error when user accesses a nil function on root object
+
+performance:
+    -- don't allocate predicates on the fly
