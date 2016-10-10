@@ -94,7 +94,6 @@ end
 function array.differenceBy(A, ...)
     local args = {...}
     local last = jo.private.pullLastIfNotTable(args)
-
     return _difference(A, jo.iteratee(last), args)
 end
 
@@ -999,6 +998,63 @@ end
 -- Note: Unlike `pull`, this method returns a new array.
 function array.without(A, ...)
     return array.difference(A, ...)
+end
+
+-------------------------------------------------------------------------------
+-- helper for xor
+local function _xor(iteratee, args)
+    local out = {}
+    local test = {}
+
+    local _count = function(x)
+        local computed = iteratee(x)
+        test[computed] = (test[computed] or 0) + 1
+    end
+
+    local _takeUniques = function(x)
+        local computed = iteratee(x)
+        if test[computed] ~= 1 then return end
+        _insert(out, x)
+    end
+
+    for i,arg in ipairs(args) do
+        array.forEach(arg, _count)
+    end
+
+    for i,arg in ipairs(args) do
+        array.forEach(arg, _takeUniques)
+    end
+    
+    return out
+end
+
+-------------------------------------------------------------------------------
+-- Creates an array of unique values that is the symmetric difference of the 
+-- given arrays. The order of result values is determined by the order they 
+-- occur in the arrays.
+function array.xor(...)
+  return _xor(jo.identity, {...})
+end
+
+-------------------------------------------------------------------------------
+-- This method is like _.xor except that it accepts iteratee which is invoked
+-- for each element of each arrays to generate the criterion by which by which
+-- they're compared. The iteratee is invoked with one argument: (value).
+function array.xorBy(...)
+    local args = {...}
+    local last = jo.private.pullLastIfNotTable(args)
+    return _xor(jo.iteratee(last), args)
+end
+
+-------------------------------------------------------------------------------
+-- This method is like _.xor except that it accepts comparator which is invoked
+-- to compare elements of arrays. The comparator is invoked with two arguments:
+-- (arrVal, othVal).
+function array.xorWith(...)
+    local args = {...}
+    local last = jo.private.pullLastIfNotTable(args)
+
+    assert(false)
 end
 
 -------------------------------------------------------------------------------
