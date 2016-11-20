@@ -1024,7 +1024,7 @@ local function _xor(iteratee, args)
     for i,arg in ipairs(args) do
         array.forEach(arg, _takeUniques)
     end
-    
+
     return out
 end
 
@@ -1051,10 +1051,16 @@ end
 -- to compare elements of arrays. The comparator is invoked with two arguments:
 -- (arrVal, othVal).
 function array.xorWith(...)
+    -- todo
     local args = {...}
-    local last = jo.private.pullLastIfNotTable(args)
+    local comparator = jo.private.pullLastIfNotTable(args)
+    comparator = comparator or jo.sameValue
 
-    assert(false)
+    for index, arg in ipairs(args) do
+        for i, value in ipairs(arg) do
+            
+        end
+    end
 end
 
 -------------------------------------------------------------------------------
@@ -1064,6 +1070,17 @@ end
 -- not functionally different from unzip in my implementation
 function array.zip(A)
    return _zip(A)
+end
+
+-------------------------------------------------------------------------------
+function array.zipObject(A)
+    -- todo
+end
+
+
+-------------------------------------------------------------------------------
+function array.zipObjectDeep(A)
+    -- todo
 end
 
 -------------------------------------------------------------------------------
