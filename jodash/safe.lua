@@ -3,6 +3,9 @@ local jo = __
 -------------------------------------------------------------------------------
 -- define a fault-tolerant object
 -------------------------------------------------------------------------------
+jo.noop = function() end
+
+-------------------------------------------------------------------------------
 local function mathNoop(lhs, rhs)
     if isNumber(lhs) then return lhs
     elseif isNumber(rhs) then return rhs
@@ -35,4 +38,9 @@ setmetatable(faultTolerantObject, {
 -------------------------------------------------------------------------------
 function jo.safe(value)
     return value or faultTolerantObject
+end
+
+-------------------------------------------------------------------------------
+function jo.safeToCall(value)
+    return (jo.isFunction(value) and value) or faultTolerantObject
 end

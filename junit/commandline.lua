@@ -9,10 +9,11 @@ local lookup = {}
 -------------------------------------------------------------------------------
 local shorthands = {
     a = "all",
-    v = "verbose",
     c = "clear",
     h = "help",
     o = "only",
+    s = "strict",
+    v = "verbose",
 }
 
 -------------------------------------------------------------------------------
@@ -29,19 +30,22 @@ local body = function(s) print( string.wrap(s, 80, 8 ) .. '\n' ) end
 lookup.help = function(junit, subParams)
     junit.hr()
     
-    title("all")
+    title("all, a")
     body("The default behavior is to stop after the first error. Runs all tests regardless of failure")
     
-    title("clear")
+    title("clear, c")
     body("Clear screen before running test")
-    
-    title("help")
+
+    title("help, h")
     body("Show this message")
 
-    title("only")
+    title("only, o")
     body("run just the specified test. specified as `subsection.methodName.TestName`")
 
-    title("verbose")
+    title("strict, s")
+    body("print a warning if no test is found for a method in a specified module")
+
+    title("verbose, v")
     body("Show verbose output")
     print(" ")
 end
@@ -56,11 +60,14 @@ end
 
 -------------------------------------------------------------------------------
 lookup.only = function(junit, subParams)
+    print(" parsing only ")
+    print(subParams)
     junit.expandWhitelist(subParams:split(","))
 end
 
 -------------------------------------------------------------------------------
 flag("all")
+flag("strict")
 flag("verbose")
 
 -------------------------------------------------------------------------------

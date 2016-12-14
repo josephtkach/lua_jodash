@@ -1,6 +1,14 @@
 ------------------------------------------------------------------------------- 
 local print = function() end
 
+-- syntactic sugar for tostring
+s = tostring
+
+-- a function for making it easy to visually identify tables that I may write
+id = function(tbl)
+    -- todo
+end
+
 -------------------------------------------------------------------------------
 -- from http://lua-users.org/wiki/CopyTable
 function deepCopy(orig, seen, depth)

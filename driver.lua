@@ -3,7 +3,16 @@
 -------------------------------------------------------------------------------
 junit = require("junit/index")
 expect = require("junit/expect")
-jo = require("jodash/index")
+_ = require("jodash/index")
+vigil = require("vigil/vigil")
+
+
+-------------------------------------------------------------------------------
+-- quick debug globals
+s = tostring
+id = function(tbl)
+
+end
 
 -------------------------------------------------------------------------------
 junit.init(arg)
@@ -11,7 +20,16 @@ junit.init(arg)
 -------------------------------------------------------------------------------
 -- array tests
 -------------------------------------------------------------------------------
-junit.testModule({
+--[[junit.testModule({
     name = "array",
     object = require("jodash/array"),
+})--]]
+
+-------------------------------------------------------------------------------
+-- vigil tests
+-------------------------------------------------------------------------------
+junit.testModule({
+    name = "vigil",
+    object = require("vigil/vigil"),
 })
+

@@ -17,7 +17,6 @@ local commandLine = require("junit/commandLine")
 exports.data = require("junit/data")
 
 -------------------------------------------------------------------------------
-local s = tostring
 local report = {}
 -- todo: better object-level management of state
 local hardBail = false
@@ -30,7 +29,7 @@ end
 -------------------------------------------------------------------------------
 function exports.expandWhitelist(tests)
     local whitelist = {}
-
+    
     for _,test in pairs(tests) do
         local path = test:split(".")
 
@@ -58,6 +57,8 @@ function exports.testModule(args)
         table.insert(alphabetically, k)
     end
 
+    exports:vprintHeader("testing a module named "..moduleName.green)
+
     table.sort(alphabetically, function(lhs, rhs) return lhs < rhs end)
 
     local function doTestMethod(methodName)
@@ -70,11 +71,15 @@ function exports.testModule(args)
 
         local loaded = nil
         local found = pcall(function()
-            loaded = require("tests/" .. methodName)
+            loaded = require(moduleName .. "/tests/" .. methodName)
         end)
 
         exports.whitelistTests = currentModule and currentModule[methodName]
-        if found then loaded:run() end
+        if found then
+            loaded:run() 
+        elseif exports.strict then
+            warn("could not find tests for " .. methodName)
+        end
     end
 
 
@@ -110,10 +115,16 @@ function exports:hr()
 end
 
 -------------------------------------------------------------------------------
-function exports:printHeader()
+function exports:printHeader(title)
     exports:hr()
-    print("\t\t" .. self.name.bright)
+    print("\t\t" .. s(title or self.name).bright)
     exports:hr()
+end
+
+-------------------------------------------------------------------------------
+function exports:vprintHeader(title)
+    if not self.verbose then return end
+    self:printHeader(title)
 end
 
 -------------------------------------------------------------------------------
@@ -126,7 +137,7 @@ local RESULT =
 
 -------------------------------------------------------------------------------
 function exports:run()
-    if exports.verbose then self:printHeader() end
+    self:vprintHeader()
 
     local orderedTests = self.orderedTests
     local succeededCount = 0
@@ -149,7 +160,7 @@ function exports:run()
         end
 
         local function catch(msg)
-            if not verbose then self:printHeader() end
+            if not exports.verbose then self:printHeader() end
             failedCount = failedCount + 1
             results = results .. msg.red
             exports:hr()

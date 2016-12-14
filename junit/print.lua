@@ -35,30 +35,39 @@ end
 -------------------------------------------------------------------------------
 function vprint(object, msg)
     local indenting = string.rep("\t", (object.treeDepth or 0)+1)
-
     if object.verbose then print(indenting .. msg) end
 end
 
 -------------------------------------------------------------------------------
 local defaultColor = "reset"
 function vprint_default_color(color)
-  defaultColor = color
+    defaultColor = color
 end
 
 -------------------------------------------------------------------------------
 function vprintfield(object, msg, field)
-  if not object.verbose then return end
+    if not object then 
+        print("vprintfield() was passed nil") 
+        return
+    end
 
-  local indenting = string.rep("\t", (object.treeDepth or 0)+1)
-  local color = "yellow"
-  if field == nil then color = "red" end
-  if type(field) == "table" then field = table_contents_to_oneliner(field) end
+    if not object.verbose then return end
 
-  print(indenting .. msg[defaultColor] .. " " .. tostring(field)[color]) 
+    local indenting = string.rep("\t", (object.treeDepth or 0)+1)
+    local color = "yellow"
+    if field == nil then color = "red" end
+    if type(field) == "table" then field = table_contents_to_oneliner(field) end
+
+    print(indenting .. msg[defaultColor] .. " " .. tostring(field)[color]) 
 end
 
 -------------------------------------------------------------------------------
 function vtprint(object)
+    if not object then 
+        print("vtprint() was passed nil") 
+        return
+    end
+
     if object.verbose then 
         local depth = (object.treeDepth or 0)+1
         tprint(object, depth, depth+5) 

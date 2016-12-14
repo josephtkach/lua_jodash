@@ -57,3 +57,10 @@ function jo.property(x)
 end
 
 -------------------------------------------------------------------------------
+function jo.ift(bool, a, b)
+    if jo.isFalsey(bool) then 
+        return b 
+    else
+        return a
+    end
+end

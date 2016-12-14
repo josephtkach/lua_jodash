@@ -10,7 +10,17 @@ local _insert = table.insert -- optimization
 function array.append(A, x)
     if not A then A = {} end
     _insert(A, x)
-    return A
+    return A, x
+end
+
+-------------------------------------------------------------------------------
+-- mine
+function array.pop(A)
+    if not A then return nil end
+    local count = #A
+    local toReturn = A[count]
+    A[count] = nil
+    return toReturn
 end
 
 -------------------------------------------------------------------------------
@@ -282,11 +292,11 @@ end
 -- The inverse of _.toPairs; this method returns an object composed from key-value pairs.
 function array.fromPairs(A)
     local output = {}
-    array.forEach(A, function(x)
-        for i = 1,2 do
-            _insert(output, x[i])
+    for i,tuple in ipairs(A) do
+        for n = 1,2 do
+            _insert(output, tuple[n])
         end
-    end)
+    end
     return output
 end
 
@@ -303,16 +313,16 @@ array.first = array.head
 -------------------------------------------------------------------------------
 function array.filter( A, predicate )
     local output = {}
-    array.forEach(A, function(x, k)
-        if predicate(x, k, A) then _insert(output, x) end
-    end)
+    for i,v in ipairs(A) do
+        if predicate(v, i, A) then _insert(output, v) end
+    end
     return output
 end
 
 -------------------------------------------------------------------------------
 function array.find(A, predicate)
     if not A then return nil end
-    for k,v in pairs(A) do
+    for i,v in ipairs(A) do
         if predicate(v) then return v end
     end
 end

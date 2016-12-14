@@ -1,3 +1,12 @@
+-----------------------------------------------------------------------------------------
+new methodology: lazy development
+    -- this project is now subordinate to IRL
+    -- develop new methods when they are needed
+-----------------------------------------------------------------------------------------
+
+caching for generated functions at top level?
+
+
 lastFailure flag
 
 seriously tho: prettify output on unit tests
