@@ -60,8 +60,6 @@ end
 
 -------------------------------------------------------------------------------
 lookup.only = function(junit, subParams)
-    print(" parsing only ")
-    print(subParams)
     junit.expandWhitelist(subParams:split(","))
 end
 

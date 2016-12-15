@@ -41,6 +41,8 @@ for k,v in pairs(colorKeys) do
   colorKeys[k] = escapeString:format(v)
 end
 
+colorKeys["identity"] = ""
+
 -------------------------------------------------------------------------------
 getmetatable("").__index = function(str,i)
     if type(i) == 'number' then

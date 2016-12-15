@@ -5,8 +5,8 @@
 local exports = {}
 exports.__index = exports
 
-local vb = _.noop
---local vb = print
+--local vb = _.noop
+local vb = print
 
 local P = {} -- privates
 -- todo: 
@@ -16,7 +16,7 @@ local P = {} -- privates
     -- better error handling
 
 -----------------------------------------------------------------------------------------
-function exports.trivial(succeed)
+function P.trivial(succeed)
     succeed(true)
 end
 
@@ -29,7 +29,7 @@ function exports.new(fn)
         outputs = 0, -- number of times we have processed a resolve from a child
     }
 
-    vb("new promise ",tostring(out))
+    vb("new promise ",idtbl(out))
 
     setmetatable(out, exports)
     P.doResolve(out, fn, exports.resolve, exports.reject)
@@ -53,7 +53,9 @@ end
 
 -----------------------------------------------------------------------------------------
 function P.callHandlers(self)
-    if not self.handlers then vb(s(self), " there are no handlers"); return end
+    vb("\t", idtbl(self), " number of outputs: ", s(self.outputs).green)
+
+    if not self.handlers then vb(idtbl(self), " there are no handlers"); return end
     local action = _.ift(self.err, "onRejected", "onFulfilled")
     vb("calling all handlers with action ", action) -- that's right meatwad
     for k,v in ipairs(self.handlers) do
@@ -63,10 +65,10 @@ end
 
 -----------------------------------------------------------------------------------------
 function P.handle(self, handler)
-    vb(tostring(self), "handle")
+    vb(idtbl(self), "handle")
     self.handlers = _.append(self.handlers, handler)
  
-    vb("\tnumber of outputs: ", s(self.outputs).green)
+    vb("\t", idtbl(self), " number of outputs: ", s(self.outputs).green)
     if self.outputs == 0 then return end
     
     local func = _.ift(self.err, handler.onRejected, handler.onFulfilled)
@@ -80,29 +82,30 @@ end
 
 -----------------------------------------------------------------------------------------
 function P.doResolve(self, fn, onFulfilled, onRejected)
-    vb(tostring(self), "doResolve")
+    vb(idtbl(self), "doResolve")
     local done = false
 
     local reject = function(reason)
-        vb("calling doResolve reject")
-        exports.reject(self, reason)
-        vb("done is ", tostring(done))
-        if done then return end
+        vb(idtbl(self), " calling doResolve reject")
+        vb(idtbl(self), " done is ", tostring(done))
+        if done then vb("returned early"); return end
         done = true
-        vb("doResolve calling onRejected")
-        print("onRejected is ", s(onRejected))
+        exports.reject(self, reason)
+        vb(idtbl(self), " doResolve calling onRejected")
+        print(idtbl(self), " onRejected is ", s(onRejected))
         _.safe(onRejected)(self, reason) 
     end
 
     local status, err = pcall( function()
-        vb(tostring(self), "invoking fn: ", tostring(fn))
+        vb(idtbl(self), "invoking fn: ", tostring(fn))
 
         fn( function(value)
-            vb(tostring(self), "fn completed")
+            self.inputs = self.inputs + 1
+            vb(idtbl(self), "fn completed")
 
-            if done then vb(tostring(self), " was already done"); return end
+            if done then vb(idtbl(self), " was already done"); return end
             done = true
-            vb(tostring(self), " onFulfilled from doResolve ", tostring(onFulfilled));
+            vb(idtbl(self), " onFulfilled from doResolve ", tostring(onFulfilled));
             _.safe(onFulfilled)(self, value)
         end, reject)
     end)
@@ -114,7 +117,7 @@ end
 
 -----------------------------------------------------------------------------------------
 function P.done(self, onFulfilled, onRejected)
-    vb(tostring(self), "done")
+    vb(idtbl(self), "done")
     P.handle(self, {
         onFulfilled = onFulfilled,
         onRejected = onRejected or P.rethrow
@@ -135,11 +138,14 @@ end
 
 -----------------------------------------------------------------------------------------
 function exports:resolve(result)
+    result = result or P.trivial
+
     if not self then
-        local newPromise = exports.new(exports.trivial)
-        return newPromise:resolve()
+        local newPromise = exports.new(result)
+        return newPromise -- avoid tail calls, they shred callstacks
     end
 
+    vb("resolving ", idtbl(self))--, debug.traceback())
     local status, err = pcall( function()
         self.outputs = self.outputs + 1
 
@@ -169,25 +175,25 @@ end
 
 -----------------------------------------------------------------------------------------
 function exports:andUntoThis(onFulfilled, onRejected)
-    vb("and unto this")
-    return exports.new(function (resolve, reject)
-        vb("\tandUntoThis intermediary")
-        return P.done(self, function (result)
+    vb(idtbl(self), " and unto this")
+    local child = exports.new( function(resolve, reject)
+        P.done(self, function (result)
             vb("\tandUntoThis done, result is: ", tostring(result))
+            local out
+
             if _.isFunction(onFulfilled) then
                 vb("\tonFulfilled is a function")
-                local out
                 local status, err = pcall( function()
-                    vb("\tcalling resolve on onFulfilled(result))")
+                    vb("\tcalling resolve with onFulfilled(result))")
                     out = resolve(onFulfilled(result));
                 end)
 
-                if err then vb("\trejecting with err"); return reject(err) end
-                return out
+                if err then vb("\trejecting with err"); out = reject(err) end
             else
                 vb("\tonFulfilled is no function. result:", tostring(result));
-                return resolve(result);
+                out = resolve(result);
             end
+            return out
         end,
         function (error)
             vb("there's an error")
@@ -195,19 +201,20 @@ function exports:andUntoThis(onFulfilled, onRejected)
                 vb("\tonRejected is a function")
                 local out
                 local status, err = pcall( function()
-                    vb("\tcalling resolve on onRejected(result))")
+                    vb("\tcalling resolve with onRejected(result))")
                     out = resolve(onRejected(result));
                 end)
 
-                if err then vb("\trejecting with err"); return reject(err) end
+                if err then vb("\trejecting with err"); out = reject(err) end
                 return out
             else
                 vb("\tonRejected is no function. result:", tostring(result));
-                return reject(error)
+                local out = reject(error)
+                return out
             end
-        end
-        )
+        end)
     end)
+    return child
 end
 
 -----------------------------------------------------------------------------------------
