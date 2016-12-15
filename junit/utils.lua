@@ -40,6 +40,7 @@ local function modulateColor(index, str)
     return str[fg][bg][bright]
 end
 
+-------------------------------------------------------------------------------
 -- a function for making it easy to visually identify tables
 idtbl = function(tbl)
     if not allIdentified[tbl] then
@@ -50,6 +51,7 @@ idtbl = function(tbl)
     return allIdentified[tbl]
 end
 
+-------------------------------------------------------------------------------
 local print = function() end
 -------------------------------------------------------------------------------
 -- from http://lua-users.org/wiki/CopyTable

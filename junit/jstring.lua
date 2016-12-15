@@ -48,7 +48,7 @@ getmetatable("").__index = function(str,i)
     if type(i) == 'number' then
         return string.sub(str,i,i)
     elseif type(i) == 'string' and colorKeys[i] then
-        return colorKeys[i] .. str .. colorKeys.reset
+        return string.format("%s%s%s", colorKeys[i], str, colorKeys.reset)
     else
         return string[i]
     end
