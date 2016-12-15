@@ -55,8 +55,6 @@ function test.outOfOrder()
         thenFinished = true
     end)
 
-    junit:hr()
-    print("for my next trick, I shall resolve")
     _resolve("resolved")
     
     expect(thenFinished):toBe(true)

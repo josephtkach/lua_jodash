@@ -5,8 +5,8 @@
 local exports = {}
 exports.__index = exports
 
---local vb = _.noop
-local vb = print
+local vb = _.noop
+--local vb = print
 
 local P = {} -- privates
 -- todo: 
@@ -59,7 +59,8 @@ function P.callHandlers(self)
     local action = _.ift(self.err, "onRejected", "onFulfilled")
     vb("calling all handlers with action ", action) -- that's right meatwad
     for k,v in ipairs(self.handlers) do
-        _.safe(v[action])
+        vb("\t here's one now ", tostring(v), tostring(v[action]))
+        _.safe(v[action])()
     end
 end
 
