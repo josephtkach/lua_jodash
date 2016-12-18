@@ -17,7 +17,11 @@ local commandLine = require("junit/commandLine")
 exports.data = require("junit/data")
 
 -------------------------------------------------------------------------------
-local report = {}
+local report = {
+    failed = 0,
+    succeeded = 0,
+}
+
 -- todo: better object-level management of state
 local hardBail = false
 
@@ -75,8 +79,9 @@ function exports.testModule(args)
         end)
 
         exports.whitelistTests = currentModule and currentModule[methodName]
+
         if found then
-            loaded:run() 
+            loaded:run()
         elseif exports.strict then
             warn("could not find tests for " .. methodName)
         end
@@ -103,6 +108,10 @@ function exports.report()
 
     if report.failed > 0 then
         print("\t" .. tostring(report.failed .. " Failed!").red)
+    end
+
+    if report.succeeded == 0 and report.failed == 0 then
+        print(("\t No Tests Were Run!").red)
     end
 
     exports:hr()

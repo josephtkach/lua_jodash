@@ -2,7 +2,12 @@
 local test = junit:new({ name = "resolve" })
 
 -------------------------------------------------------------------------------
-function test.startChain()
+function test.empty()
+    vigil.new():resolve()
+end
+
+-------------------------------------------------------------------------------
+function test.resolveShorthand()
     vigil.resolve()
 end
 
@@ -16,14 +21,12 @@ function test.trivial()
     end)
 
     -- we're going to cheat and peak at the internal state of P
-    expect(p.inputs):toBe(0)
-    expect(p.outputs):toBe(0)
+    expect(p.times):toBe(0)
     expect(p.err):toBe(false)
 
     _resolve("resolved")
 
-    expect(p.inputs):toBe(1)
-    expect(p.outputs):toBe(1)
+    expect(p.times):toBe(1)
     expect(p.err):toBe(false)
     expect(p.value):toBe("resolved")
 end
@@ -50,8 +53,7 @@ function test.withAPromise()
 
     _resolve(p2)
 
-    expect(p.inputs):toBe(1)
-    expect(p.outputs):toBe(0)
+    expect(p.times):toBe(0)
     expect(p.err):toBe(false)
     expect(p.value):toBe(nil)
 
@@ -59,8 +61,7 @@ function test.withAPromise()
 
     _resolve2("resolved")
 
-    expect(p.inputs):toBe(1)
-    expect(p.outputs):toBe(1)
+    expect(p.times):toBe(1)
     expect(p.err):toBe(false)
 
     expect(p.value):toBe("resolved")

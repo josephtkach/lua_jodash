@@ -12,7 +12,9 @@ expectation.__index = function(self, key)
         return function(...)
             local arg = {...}
             local result = v(unpack(arg))
+
             assert(result)
+
             return result
         end
     end
@@ -54,6 +56,10 @@ function expectation:toBe(rhs)
         print(" ")
         print(tostring("expected:").green .. tostring(rhs))
         print(tostring("actual:").green .. tostring(self.obj))
+        
+        local info = debug.getinfo(3, "Sl")
+        print("at " .. info.short_src.blue 
+            .. ":" .. tostring(info.currentline).yellow)
     end
     return result
 end
