@@ -46,19 +46,19 @@ end
 -------------------------------------------------------------------------------
 function test.outOfOrder()
     local _resolve, _reject
-    local thenFinished = false
+    local value = false
 
     local p = vigil.new( function(resolve, reject)
         _resolve = resolve
         _reject = reject
     end)
-    :andUntoThis( function()
-        thenFinished = true
+    :andUntoThis( function(got)
+        value = got
     end)
 
     _resolve("resolved")
 
-    expect(thenFinished):toBe(true)
+    expect(value):toBe("resolved")
 end
 
 -------------------------------------------------------------------------------
@@ -99,11 +99,13 @@ end
 
 -------------------------------------------------------------------------------
 function test.resolve_addThen_resolve()
-    local executed = 0
+    local executedFirst = 0
+    local executedSecond = 0
 
     local start = vigil.new()
 
-    expect(executed):toBe(0)
+    expect(executedFirst):toBe(0)
+    expect(executedSecond):toBe(0)
     expect(start.times):toBe(0)
     
     start:resolve()
@@ -111,14 +113,19 @@ function test.resolve_addThen_resolve()
     expect(start.times):toBe(1)
     
     start:andUntoThis( function()
-        executed = executed + 1
+        executedFirst = executedFirst + 1
+    end)
+    :andUntoThis( function()
+        executedSecond = executedSecond + 1
     end)
 
-    expect(executed):toBe(1)
+    expect(executedFirst):toBe(1)
+    expect(executedSecond):toBe(1)
     expect(start.times):toBe(1)
 
     start:resolve()
-    expect(executed):toBe(2)
+    expect(executedFirst):toBe(2)
+    expect(executedSecond):toBe(2)
     expect(start.times):toBe(2)
 end
 
