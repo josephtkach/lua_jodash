@@ -61,13 +61,10 @@ end
 
 -----------------------------------------------------------------------------------------
 function exports.reject(self, error)
-    vb(idtbl(self), " P.onRejected")
+    vb(idtbl(self), " exports.reject")
+
     self.err = error
     P.callHandlers(self)
-    if debugErrors and not self.handlers then
-        vb(idtbl(self), "rethrowing?")
-        P.rethrow(error) 
-    end
 end
 
 -----------------------------------------------------------------------------------------
@@ -87,7 +84,7 @@ function P.callHandlers(self)
         " and param ", pr(param)) -- that's right meatwad
    
     for k,v in ipairs(self.handlers) do
-        vb("\t\t here's one now ", s(v), s(v[action]))
+        vb("\t\t", idtbl(self), " here's one now ", s(v), s(v[action]))
         _.safe(v[action])(param)
     end
 end
@@ -105,8 +102,12 @@ function P.handle(self, handler)
 end
 
 -----------------------------------------------------------------------------------------
-function P.rethrow(err)
-    assert(false, err)
+function P.maybeRethrow(err)
+    if P.debugErrors then
+        print(s("rethrow").red)
+        print(err)
+        assert(false)
+    end
 end
 
 -----------------------------------------------------------------------------------------
@@ -121,7 +122,7 @@ function P.invokeFn(self, fn, onFulfilled, onRejected)
         _.safe(onRejected)(self, reason) 
     end
 
-    local status, err = pcall( function()
+    local succeeded, errorMsg = pcall( function()
         vb(idtbl(self), "invoking fn: ", s(fn))
 
         fn( function(value)
@@ -129,6 +130,8 @@ function P.invokeFn(self, fn, onFulfilled, onRejected)
             _.safe(onFulfilled)(self, value)
         end, reject)
     end)
+
+    if not succeeded then P.maybeRethrow(err) end
 end
 
 -----------------------------------------------------------------------------------------
@@ -138,13 +141,14 @@ end
 
 -----------------------------------------------------------------------------------------
 function P.chainVigil(self, subsequent)
+    vb(idtbl(self), " chaining into ", idtbl(subsequent))
     P.handle(subsequent, {
         onFulfilled = function(val)
             vb(idtbl(self), " resolving through vigil chain with ", pr(val))
             self:resolve(val)
         end,
         onRejected = function(err)
-            vb(idtbl(self), " rejeting through vigil chain with ", pr(val))
+            vb(idtbl(self), " rejecting through vigil chain with ", pr(val))
             self:reject(err)
         end
     })
@@ -160,22 +164,23 @@ function exports:resolve(result)
     end
 
     vb("resolving ", idtbl(self), " with ", pr(result))--, debug.traceback())
-    local status, err = pcall( function()
+    local succeeded, returned = pcall( function()
         -- resolve accepts either a promise or a plain value and if
         -- it's a promise, waits for it to complete
         -- going to need some kind of "once"
         if P.isVigil(result) then
             P.chainVigil(self, result)
-            return self
+            return
         end
 
         self.times = self.times + 1
-        vb(idtbl(self), " calling P.fulfill with ", pr(result))
+        vb(idtbl(self), " incrementing times; calling P.fulfill with ", pr(result))
         P.fulfill(self, result);
     end)
 
-    if err then
-        self:reject(err)
+    if not succeeded then
+        self:reject(returned)
+        P.maybeRethrow(returned)
     end
 
     return self
@@ -188,14 +193,16 @@ function P.tryHandleWithResult(result, handler, resolve, reject)
     if _.isFunction(handler) then
         vb("\thandler is a function. calling with ", pr(result))
 
-        local status, err = pcall( function()
+        local succeeded, errorMsg = pcall( function()
             result = handler(result);
             vb("\thandler returned ", pr(result))
         end)
 
-        if err then 
-            vb("\trejecting with err")
-            local out = reject(err) 
+        if not succeeded then 
+            vb("\trejecting with error")
+            P.maybeRethrow(errorMsg)
+
+            local out = reject(errorMsg) 
             return out -- keep tail calls out of the call stack
         end
     end
