@@ -153,7 +153,7 @@ function to_s(...)
         if type(v) == "table" then
             toPrint = toPrint .. " " .. table_contents_to_oneliner(v)
         elseif type(v) == "boolean" then
-            toPrint = toPrint .. " BOOL:" .. tostring(v)
+            toPrint = toPrint .. " BOOL:" .. tostring(v).yellow
         else
             toPrint = toPrint .. " " .. tostring(v)
         end
@@ -163,5 +163,5 @@ end
 
 --------------------------------------------------------------------------------
 function print(...)
-    _print(to_s(unpack({...})))
+    _print(to_s(...))
 end

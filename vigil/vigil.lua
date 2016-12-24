@@ -5,7 +5,7 @@
 local exports = {}
 exports.__index = exports
 local P = {} -- privates
-P.debugErrors = false -- should be off unless we are debugging library internals
+P.debugErrors = false -- should be `false` unless we are debugging library internals
 
 -----------------------------------------------------------------------------------------
 -- debug ish
@@ -21,10 +21,6 @@ local function pr(val)
     if type(val) == "string" then return val.blue end
     return s(val).yellow
 end
-
--- todo: 
-    -- make this feel lua-native
-    -- modify implementation to be multiply callable
 
 -----------------------------------------------------------------------------------------
 function P.trivial(succeed)
@@ -61,7 +57,7 @@ end
 
 -----------------------------------------------------------------------------------------
 function exports.reject(self, error)
-    vb(idtbl(self), " exports.reject")
+    vb(idtbl(self), " exports.reject with error", s(error).red)
 
     self.err = error
     P.callHandlers(self)
@@ -69,9 +65,9 @@ end
 
 -----------------------------------------------------------------------------------------
 function P.callHandlers(self)
-    vb("\t", idtbl(self), " times: ", s(self.times).green)
+    vb("\t", idtbl(self), "callHandlers, times: ", s(self.times).green)
 
-    if not self.handlers then vb(idtbl(self), " there are no handlers"); return end
+    if not self.handlers then vb("\t", idtbl(self), " there are no handlers"); return end
 
     local action, param
     if self.err then
@@ -95,10 +91,14 @@ function P.handle(self, handler)
     self.handlers = _.append(self.handlers, handler)
  
     vb("\t", idtbl(self), " times: ", s(self.times).green)
-    if self.times == 0 then return end
+    vb("\t", idtbl(self), " self.err: ", s(self.err).green)
+    if self.times == 0 and not self.err then return end
     
-    local func = _.ift(self.err, handler.onRejected, handler.onFulfilled)
-    _.safeToCall(func)(self.value)
+    if self.err then
+        _.safeToCall(handler.onRejected)(self.err)
+    else
+        _.safeToCall(handler.onFulfilled)(self.value)
+    end
 end
 
 -----------------------------------------------------------------------------------------
@@ -115,10 +115,11 @@ function P.invokeFn(self, fn, onFulfilled, onRejected)
     vb(idtbl(self), "invokeFn")
 
     local reject = function(reason)
-        vb(idtbl(self), " calling invokeFn reject")
+        vb(idtbl(self), " calling invokeFn reject with reason ", s(reason).red)
+        --vb(debug.traceback())
         exports.reject(self, reason)
         vb(idtbl(self), " invokeFn calling onRejected")
-        vb(idtbl(self), " onRejected is ", s(onRejected))
+        vb(idtbl(self), " onRejected is ", s(onRejected).red)
         _.safe(onRejected)(self, reason) 
     end
 
@@ -163,6 +164,9 @@ function exports:resolve(result)
         return newPromise -- keep tail calls out of the call stack
     end
 
+    -- clear any errors
+    self.err = false
+
     vb("resolving ", idtbl(self), " with ", pr(result))--, debug.traceback())
     local succeeded, returned = pcall( function()
         -- resolve accepts either a promise or a plain value and if
@@ -190,25 +194,25 @@ end
 function P.tryHandleWithResult(result, handler, resolve, reject)
     vb("\ttryHandleWithResult: ", pr(result))
 
-    if _.isFunction(handler) then
-        vb("\thandler is a function. calling with ", pr(result))
-
-        local succeeded, errorMsg = pcall( function()
-            result = handler(result);
-            vb("\thandler returned ", pr(result))
-        end)
-
-        if not succeeded then 
-            vb("\trejecting with error")
-            P.maybeRethrow(errorMsg)
-
-            local out = reject(errorMsg) 
-            return out -- keep tail calls out of the call stack
-        end
+    if not _.isFunction(handler) then
+        return false, result
     end
-    
-    local out = resolve(result)
-    return out
+
+    vb("\thandler is a function. calling with ", pr(result))
+
+    local succeeded, errorMsg = pcall( function()
+        result = handler(result);
+        vb("\thandler returned ", pr(result))
+    end)
+
+    if not succeeded then 
+        vb("\trejecting with error")
+        P.maybeRethrow(errorMsg)
+
+        result = reject(errorMsg) 
+    end
+
+    return (not succeeded), result
 end
 
 -----------------------------------------------------------------------------------------
@@ -221,11 +225,26 @@ function exports:andUntoThis(onFulfilled, onRejected)
     local child = exports.new( function(resolve, reject)
         P.handle(self, {
             onFulfilled = function (result)
-                local out = P.tryHandleWithResult(result, onFulfilled, resolve, reject)
+                vb(idtbl(self), "onFulfilled")
+                local handled, out = P.tryHandleWithResult(result, onFulfilled, resolve, reject)
+                
+                if not handled then
+                    vb(idtbl(self), "handler did not handle")
+                    out = resolve(out)
+                end
+
                 return out
             end,
             onRejected = function (result)
-                local out = P.tryHandleWithResult(result, onRejected, resolve, reject)
+                vb(idtbl(self), "onRejected")
+
+                local handled, out = P.tryHandleWithResult(result, onRejected, resolve, reject)
+
+                if not handled then 
+                    vb(idtbl(self), "handler did not handle")
+                    out = reject(out)
+                end
+
                 return out
             end,
         })
@@ -234,14 +253,21 @@ function exports:andUntoThis(onFulfilled, onRejected)
 end
 
 -----------------------------------------------------------------------------------------
-function exports:each(ps)
-    -- todo obv
+function P.passThrough(val)
+    return val
 end
 
 -----------------------------------------------------------------------------------------
 function exports:catch(fn)
+    vb(idtbl(self), "catch")
+    return self:andUntoThis( P.passThrough, fn ) 
+end
+
+-----------------------------------------------------------------------------------------
+function exports:each(ps)
     -- todo obv
 end
+
 
 -----------------------------------------------------------------------------------------
 return exports

@@ -130,8 +130,9 @@ function test.resolve_addThen_resolve()
 end
 
 -------------------------------------------------------------------------------
-function test.failStopsPropagation()
+function test.catch()
     local gotToSuccess = false
+    local didCatch = false
 
     vigil.resolve()
     :andUntoThis( function()
@@ -140,8 +141,35 @@ function test.failStopsPropagation()
     :andUntoThis( function()
         gotToSuccess = true
     end)
+    :catch( function(err)
+        didCatch = true
+    end)
 
     expect(gotToSuccess):toBe(false)
+    expect(didCatch):toBe(true)
+end
+
+-------------------------------------------------------------------------------
+function test.catchPassThrough()
+    local gotToSuccess = false
+    local didCatch = false
+
+    vigil.resolve()
+    :catch( function(err)
+        didCatch = true
+    end)
+    :andUntoThis( function()
+        gotToSuccess = true
+    end)
+    
+
+    expect(gotToSuccess):toBe(true)
+    expect(didCatch):toBe(false)
+end
+
+-------------------------------------------------------------------------------
+function test.returnAPromiseAgain()
+    -- TODO
 end
 
 -------------------------------------------------------------------------------

@@ -1,38 +1,44 @@
------------------------------------------------------------------------------------------
-new methodology: lazy development
+-------------------------------------------------------------------------------
+current methodology: lazy development
     -- this project is now subordinate to IRL
     -- develop new methods when they are needed
------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
-caching for generated functions at top level?
+-------------------------------------------------------------------------------
+junit 
+    make a better print in harness
+    lastFailure flag -- only run the last test that failed
+    hierarchy for test folders/objects
+    fix output so that errors appear AFTER test heading instead of before
 
+-------------------------------------------------------------------------------
 
-lastFailure flag
+-------------------------------------------------------------------------------
+jodash
+    caching for generated functions at top level?
+    convention: predicates should be arged like function(x,k)
 
-seriously tho: prettify output on unit tests
-convention: predicates should be arged like function(x,k)
+    implicit chaining?
 
-hierarchy for test folders/objects
+    init function
+        -- wrap file-level scope operations in jodash index
+        -- OPTION: treat empty table as falsey
+        -- OPTION: provide array pre-allocator
+        -- OPTION: provide C++-bound NaaN check
+        -- OPTION: enhance string metatable
 
-implicit chaining?
+    calculate velocity and ship date
 
-init function
-    -- wrap file-level scope operations in jodash index
-    -- OPTION: treat empty table as falsey
-    -- OPTION: provide array pre-allocator
-    -- OPTION: provide C++-bound NaaN check
-    -- OPTION: enhance string metatable
+    remember previous run outputs and selectively toggle verbose output for failed tests
+    instrumentation for debugging
+        -- wrap every method in a functor that supports verbosity
 
-calculate velocity and ship date
+    better object level management of unit test harness state
+    better error when user accesses a nil function on root object
 
-remember previous run outputs and selectively toggle verbose output for failed tests
-instrumentation for debugging
-    -- wrap every method in a functor that supports verbosity
+    performance:
+        -- don't allocate predicates on the fly if possible
+        -- configuration options for memory vs. cpu tradeoffs
+        -- don't (ever?) use # operator
+-------------------------------------------------------------------------------
 
-better object level management of unit test harness state
-better error when user accesses a nil function on root object
-
-performance:
-    -- don't allocate predicates on the fly if possible
-    -- configuration options for memory vs. cpu tradeoffs
-    -- don't (ever?) use # operator
