@@ -494,10 +494,12 @@ function array.lastIndexOf(A, value, fromIndex)
 end
 
 -------------------------------------------------------------------------------
-function array.map( A, predicate )
+function array.map( A, iteratee )
     local output = {}
+    iteratee = jo.iteratee(iteratee)
+
     for i,v in ipairs(A) do
-        _insert(output, predicate(v, i))
+        _insert(output, iteratee(v, i, A))
     end
     return output
 end

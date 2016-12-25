@@ -288,10 +288,44 @@ function exports:catch(fn)
 end
 
 -----------------------------------------------------------------------------------------
-function exports:each(ps)
-    -- todo obv
+function exports:each(ps, fn)
+    local currentP = ps[1]
+
+    for i = 2,#ps do
+        local nextP = ps[i]
+        P.chainVigil(currentP, nextP)
+        currentP = nextP
+    end
+
+    return currentP
 end
 
+-----------------------------------------------------------------------------------------
+function exports:all(ps)
+    local toReturn = exports.new()
+
+    local count = 0
+    local reported = {}
+    for i,p in ipairs(ps) do
+        count = count + 1
+        p:andUntoThis( function()
+            reported[i] = true
+
+            for check = 1,count do
+                if not reported[check] then return end
+            end
+
+            toReturn:resolve( _.map(ps, "value") )
+        end)
+    end
+
+    return toReturn
+end
+
+-----------------------------------------------------------------------------------------
+function exports:join(ps)
+    -- todo
+end
 
 -----------------------------------------------------------------------------------------
 return exports
