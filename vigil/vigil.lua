@@ -328,4 +328,17 @@ function exports:join(ps)
 end
 
 -----------------------------------------------------------------------------------------
+function exports.ant( func )
+    local out = exports.new()
+    local cb = function(arg)
+        out:resolve(arg)
+    end
+    
+    return function(...)
+        func(..., cb)
+        return out
+    end
+end
+
+-----------------------------------------------------------------------------------------
 return exports

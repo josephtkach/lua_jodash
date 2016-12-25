@@ -20,18 +20,18 @@ _jo._ = exports
 
 -------------------------------------------------------------------------------
 -- jodash, assemble!
-_jo.array = require("jodash/array")
-_jo.hash = require("jodash/hash")
+_jo.array = require("jodash.array")
+_jo.hash = require("jodash.hash")
 
 -- these add to the global object
-require("jodash/debug")
-require("jodash/safe")
-require("jodash/lang")
-require("jodash/number")
-require("jodash/object")
-require("jodash/predicates")
-require("jodash/private")
-require("jodash/utils")
+require("jodash.debug")
+require("jodash.safe")
+require("jodash.lang")
+require("jodash.number")
+require("jodash.object")
+require("jodash.predicates")
+require("jodash.private")
+require("jodash.utils")
 
 -------------------------------------------------------------------------------
 -- compatibility
