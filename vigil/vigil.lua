@@ -8,7 +8,7 @@ local P = {} -- privates
 P.debugErrors = false -- should be `false` unless we are debugging library internals
 
 -----------------------------------------------------------------------------------------
--- debug ish
+-- debug miscellany
 local vb = _.noop
 --local vb = print
 
@@ -102,6 +102,23 @@ function P.handle(self, handler)
 end
 
 -----------------------------------------------------------------------------------------
+function P.stopHandling(self, tag)
+    if not self.handlers then return end
+
+    local pull
+
+    for k,v in ipairs(self.handlers) do
+        if v.tag == tag then
+            pull = k
+            break
+        end
+    end
+
+    if not pull then return end
+    table.remove(self.handlers, pull)
+end
+
+-----------------------------------------------------------------------------------------
 function P.maybeRethrow(err)
     if P.debugErrors then
         print(s("rethrow").red)
@@ -143,6 +160,12 @@ end
 -----------------------------------------------------------------------------------------
 function P.chainVigil(self, subsequent)
     vb(idtbl(self), " chaining into ", idtbl(subsequent))
+
+    if self.intermediatePromise then
+        P.stopHandling(self.intermediatePromise, self)
+    end
+
+    self.intermediatePromise = subsequent
     P.handle(subsequent, {
         onFulfilled = function(val)
             vb(idtbl(self), " resolving through vigil chain with ", pr(val))
@@ -151,7 +174,8 @@ function P.chainVigil(self, subsequent)
         onRejected = function(err)
             vb(idtbl(self), " rejecting through vigil chain with ", pr(val))
             self:reject(err)
-        end
+        end,
+        tag = self,
     })
 end
 

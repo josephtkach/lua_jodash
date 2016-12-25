@@ -169,7 +169,32 @@ end
 
 -------------------------------------------------------------------------------
 function test.returnAPromiseAgain()
-    -- TODO
+    local innerPromises = {}
+    local executedFinal = 1
+
+    local start = vigil.resolve()
+
+    start:andUntoThis( function()
+        innerPromises[executedFinal] = vigil.new( function() end )
+        return innerPromises[executedFinal]
+    end)
+    :andUntoThis( function(value)
+         executedFinal = executedFinal + 1
+    end)
+
+    expect(executedFinal):toBe(1)
+    
+    innerPromises[1]:resolve("resolved")
+    expect(executedFinal):toBe(2)
+
+    start:resolve()
+    expect(innerPromises[2]):toExist()
+
+    innerPromises[1]:resolve("resolved")
+    expect(executedFinal):toBe(2)
+
+    innerPromises[2]:resolve("resolved")
+    expect(executedFinal):toBe(3)
 end
 
 -------------------------------------------------------------------------------
