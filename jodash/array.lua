@@ -337,6 +337,10 @@ function array.forEach( A, predicate )
 end
 
 -------------------------------------------------------------------------------
+-- alias
+array.each = array.forEach
+
+-------------------------------------------------------------------------------
 -- Gets the index at which the first occurrence of value is found in array
 -- using == for comparisons. If fromIndex is negative, it’s used as the offset
 -- from the end of array.

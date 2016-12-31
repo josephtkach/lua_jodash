@@ -5,7 +5,8 @@
 local exports = {}
 exports.__index = exports
 local P = {} -- privates
-P.debugErrors = false -- should be `false` unless we are debugging library internals
+-- todo: error handling is borked
+P.debugErrors = true -- should be `false` unless we are debugging library internals
 
 -----------------------------------------------------------------------------------------
 -- debug miscellany
@@ -13,7 +14,7 @@ local vb = _.noop
 --local vb = print
 
 local idtbl = idtbl or _.noop
-local s = s or _.safe
+local s = s or tostring
 
 local function pr(val)
     if val == nil then return s(val).red end
@@ -315,8 +316,8 @@ function exports:all(ps)
                 if not reported[check] then return end
             end
 
-            toReturn:resolve( _.map(ps, "value") )
         end)
+            toReturn:resolve( _.map(ps, "value") )
     end
 
     return toReturn
